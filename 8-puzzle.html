@@ -162,18 +162,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#parte-1" id="toc-parte-1" class="nav-link active" data-scroll-target="#parte-1">Parte 1</a>
   <ul class="collapse">
-  <li><a href="#el-problema" id="toc-el-problema" class="nav-link" data-scroll-target="#el-problema">El problema</a></li>
+  <li><a href="#el-problema" id="toc-el-problema" class="nav-link" data-scroll-target="#el-problema">3.2.1 — El problema</a></li>
   <li><a href="#los-tableros-de-esta-clase" id="toc-los-tableros-de-esta-clase" class="nav-link" data-scroll-target="#los-tableros-de-esta-clase">Los tableros de esta clase</a></li>
   <li><a href="#la-interfaz-sobre-el-tablero-chico" id="toc-la-interfaz-sobre-el-tablero-chico" class="nav-link" data-scroll-target="#la-interfaz-sobre-el-tablero-chico">La interfaz, sobre el tablero chico</a></li>
   </ul></li>
   <li><a href="#parte-2" id="toc-parte-2" class="nav-link" data-scroll-target="#parte-2">Parte 2</a>
   <ul class="collapse">
-  <li><a href="#búsqueda-en-amplitud" id="toc-búsqueda-en-amplitud" class="nav-link" data-scroll-target="#búsqueda-en-amplitud">2.1 Búsqueda en amplitud</a></li>
-  <li><a href="#costo-uniforme" id="toc-costo-uniforme" class="nav-link" data-scroll-target="#costo-uniforme">2.2 Costo uniforme</a></li>
-  <li><a href="#búsqueda-en-profundidad" id="toc-búsqueda-en-profundidad" class="nav-link" data-scroll-target="#búsqueda-en-profundidad">2.3 Búsqueda en profundidad</a></li>
-  <li><a href="#profundidad-limitada" id="toc-profundidad-limitada" class="nav-link" data-scroll-target="#profundidad-limitada">2.4 Profundidad limitada</a></li>
-  <li><a href="#profundidad-iterativa" id="toc-profundidad-iterativa" class="nav-link" data-scroll-target="#profundidad-iterativa">2.5 Profundidad iterativa</a></li>
-  <li><a href="#búsqueda-bidireccional" id="toc-búsqueda-bidireccional" class="nav-link" data-scroll-target="#búsqueda-bidireccional">2.6 Búsqueda bidireccional</a></li>
+  <li><a href="#búsqueda-en-amplitud" id="toc-búsqueda-en-amplitud" class="nav-link" data-scroll-target="#búsqueda-en-amplitud">2.1 — Búsqueda en amplitud</a></li>
+  <li><a href="#costo-uniforme-dijkstra" id="toc-costo-uniforme-dijkstra" class="nav-link" data-scroll-target="#costo-uniforme-dijkstra">2.2 — Costo uniforme (Dijkstra)</a></li>
+  <li><a href="#búsqueda-en-profundidad" id="toc-búsqueda-en-profundidad" class="nav-link" data-scroll-target="#búsqueda-en-profundidad">2.3 — Búsqueda en profundidad</a></li>
+  <li><a href="#profundidad-limitada" id="toc-profundidad-limitada" class="nav-link" data-scroll-target="#profundidad-limitada">2.4 — Profundidad limitada</a></li>
+  <li><a href="#profundidad-iterativa" id="toc-profundidad-iterativa" class="nav-link" data-scroll-target="#profundidad-iterativa">2.5 — Profundidad iterativa</a></li>
+  <li><a href="#búsqueda-bidireccional" id="toc-búsqueda-bidireccional" class="nav-link" data-scroll-target="#búsqueda-bidireccional">2.6 — Búsqueda bidireccional</a></li>
   </ul></li>
   <li><a href="#parte-3" id="toc-parte-3" class="nav-link" data-scroll-target="#parte-3">Parte 3</a></li>
   <li><a href="#lo-que-el-mapa-escondía" id="toc-lo-que-el-mapa-escondía" class="nav-link" data-scroll-target="#lo-que-el-mapa-escondía">Lo que el mapa escondía</a></li>
@@ -203,88 +203,99 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>Russell &amp; Norvig, <em>Artificial Intelligence: A Modern Approach</em>, 4ª edición, capítulo 3, sección 3.2.1 y figura 3.4.</p>
-<p>El mismo capítulo, los mismos cinco algoritmos, otro problema. La idea de esta clase es corta: <strong>no hay que tocar ni una línea de los algoritmos.</strong> Entran por la misma interfaz de <code>Problem</code> que el mapa de Rumania, y lo único que se escribe de nuevo son las tres funciones que definen el problema.</p>
-<p>Lo interesante es lo que aparece al cambiarlo. El mapa de Rumania es un caso cómodo, y esa comodidad tapaba tres cosas.</p>
+<p>Los mismos cinco algoritmos de la clase anterior, aplicados a otro problema. <strong>No hay que tocar ni una línea de los algoritmos</strong>: entran por la misma interfaz de <code>Problem</code> que el mapa de Rumania, y lo único que se escribe de nuevo son las tres funciones que definen el problema.</p>
+<p>El mapa de Rumania es un caso cómodo, y esa comodidad tapaba tres cosas. Vamos a verlas aparecer.</p>
 <hr>
 <section id="parte-1" class="level2">
 <h2 class="anchored" data-anchor-id="parte-1">Parte 1</h2>
 <p>Configuración inicial del problema</p>
 <section id="el-problema" class="level3">
-<h3 class="anchored" data-anchor-id="el-problema">El problema</h3>
+<h3 class="anchored" data-anchor-id="el-problema">3.2.1 — El problema</h3>
 <p>Un tablero de 3×3 con ocho fichas numeradas y un hueco. Se corre una ficha por vez al hueco, hasta dejar el tablero ordenado.</p>
-<p>La interfaz es la misma de siempre:</p>
+<p>Los elementos a definir son los mismos de la clase anterior:</p>
 <ul>
 <li><strong>INITIAL</strong>: el tablero desordenado</li>
 <li><strong>GOAL</strong>: el tablero ordenado</li>
 <li><strong>ACTIONS(s)</strong>: a dónde se puede mover el hueco</li>
 <li><strong>RESULT(s, a)</strong>: el tablero que queda después de moverlo</li>
-<li><strong>ACTION_COST(s, a, s’)</strong>: 1, siempre — mover una ficha es mover una ficha</li>
+<li><strong>ACTION_COST(s, a, s’)</strong>: 1 siempre, mover una ficha es mover una ficha</li>
 </ul>
-<p>Un estado es una tupla de nueve números, con el <code>0</code> como hueco. Tupla y no lista porque tiene que poder entrar en un conjunto y en un diccionario: los algoritmos guardan estados en <code>reached</code>.</p>
+<p>Un <strong>estado</strong> es una tupla de nueve números, con el <code>0</code> como hueco:</p>
+<pre><code>(1, 2, 3,        1 2 3
+ 4, 8, 5,   -&gt;   4 8 5
+ 7, 6, 0)        7 6 _</code></pre>
+<p>Tupla y no lista porque tiene que poder entrar en un conjunto y en un diccionario: los algoritmos guardan estados en <code>reached</code>, y para eso el estado tiene que ser hashable.</p>
 <div id="97988f3e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.348051Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.347815Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.358258Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.356802Z&quot;}}" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem es el mismo de siempre: la interfaz que ya usa Rumania.</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> problem <span class="im">import</span> Problem</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># El hueco es el 0. Las posiciones van de 0 a 8, por filas.</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>GOAL <span class="op">=</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>        <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">0</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Cuanto se mueve el hueco dentro de la tupla con cada accion.</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>PASOS <span class="op">=</span> {<span class="st">"abajo"</span>: <span class="op">+</span><span class="dv">3</span>, <span class="st">"arriba"</span>: <span class="op">-</span><span class="dv">3</span>, <span class="st">"derecha"</span>: <span class="op">+</span><span class="dv">1</span>, <span class="st">"izquierda"</span>: <span class="op">-</span><span class="dv">1</span>}</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EightPuzzle(Problem):</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""El 8-puzzle. Una accion mueve EL HUECO, no la ficha.</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">    Es la convencion del libro y simplifica todo: hay a lo sumo cuatro</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co">    acciones, y son las mismas cuatro siempre. Mover el hueco "arriba"</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">    se ve en el tablero como una ficha que baja.</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, INITIAL, GOAL<span class="op">=</span>GOAL):</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(INITIAL, GOAL)</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ACTIONS(<span class="va">self</span>, state):</span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        fila, col <span class="op">=</span> <span class="bu">divmod</span>(state.index(<span class="dv">0</span>), <span class="dv">3</span>)</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        bordes <span class="op">=</span> {<span class="st">"arriba"</span>: fila <span class="op">==</span> <span class="dv">0</span>, <span class="st">"abajo"</span>: fila <span class="op">==</span> <span class="dv">2</span>,</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"izquierda"</span>: col <span class="op">==</span> <span class="dv">0</span>, <span class="st">"derecha"</span>: col <span class="op">==</span> <span class="dv">2</span>}</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Orden alfabetico, por lo mismo que en romania.py: que dos</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># corridas den siempre el mismo arbol.</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> [a <span class="cf">for</span> a <span class="kw">in</span> <span class="bu">sorted</span>(PASOS) <span class="cf">if</span> <span class="kw">not</span> bordes[a]]</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> RESULT(<span class="va">self</span>, state, action):</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> state.index(<span class="dv">0</span>)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>        j <span class="op">=</span> i <span class="op">+</span> PASOS[action]</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        fichas <span class="op">=</span> <span class="bu">list</span>(state)</span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        fichas[i], fichas[j] <span class="op">=</span> fichas[j], fichas[i]</span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">tuple</span>(fichas)</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ACTION_COST no se define: cada movimiento cuesta 1, que es lo que</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ya devuelve Problem. h() tampoco, todavia: las heuristicas del</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 8-puzzle (fichas mal puestas, distancia Manhattan) son de la</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># clase que viene, cuando aparezcan greedy y A*.</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem es el mismo de siempre: la interfaz que ya usa Rumania.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> problem <span class="im">import</span> Problem</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># El hueco es el 0. Las posiciones van de 0 a 8, por filas.</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>GOAL <span class="op">=</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">0</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Cuanto se mueve el hueco dentro de la tupla con cada accion.</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>PASOS <span class="op">=</span> {<span class="st">"abajo"</span>: <span class="op">+</span><span class="dv">3</span>, <span class="st">"arriba"</span>: <span class="op">-</span><span class="dv">3</span>, <span class="st">"derecha"</span>: <span class="op">+</span><span class="dv">1</span>, <span class="st">"izquierda"</span>: <span class="op">-</span><span class="dv">1</span>}</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EightPuzzle(Problem):</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""El 8-puzzle. Una accion mueve EL HUECO, no la ficha.</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">    Es la convencion del libro y simplifica todo: hay a lo sumo cuatro</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">    acciones, y son las mismas cuatro siempre. Mover el hueco "arriba"</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">    se ve en el tablero como una ficha que baja.</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, INITIAL, GOAL<span class="op">=</span>GOAL):</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(INITIAL, GOAL)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ACTIONS(<span class="va">self</span>, state):</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        fila, col <span class="op">=</span> <span class="bu">divmod</span>(state.index(<span class="dv">0</span>), <span class="dv">3</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        bordes <span class="op">=</span> {<span class="st">"arriba"</span>: fila <span class="op">==</span> <span class="dv">0</span>, <span class="st">"abajo"</span>: fila <span class="op">==</span> <span class="dv">2</span>,</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"izquierda"</span>: col <span class="op">==</span> <span class="dv">0</span>, <span class="st">"derecha"</span>: col <span class="op">==</span> <span class="dv">2</span>}</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Orden alfabetico, por lo mismo que en romania.py: que dos</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># corridas den siempre el mismo arbol.</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> [a <span class="cf">for</span> a <span class="kw">in</span> <span class="bu">sorted</span>(PASOS) <span class="cf">if</span> <span class="kw">not</span> bordes[a]]</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> RESULT(<span class="va">self</span>, state, action):</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> state.index(<span class="dv">0</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        j <span class="op">=</span> i <span class="op">+</span> PASOS[action]</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        fichas <span class="op">=</span> <span class="bu">list</span>(state)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        fichas[i], fichas[j] <span class="op">=</span> fichas[j], fichas[i]</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">tuple</span>(fichas)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ACTION_COST no se define: cada movimiento cuesta 1, que es lo que</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ya devuelve Problem. h() tampoco, todavia: las heuristicas del</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 8-puzzle (fichas mal puestas, distancia Manhattan) son de la</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># clase que viene, cuando aparezcan greedy y A*.</span></span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Una acción mueve <strong>el hueco</strong>, no la ficha. Es la convención del libro y simplifica todo: hay a lo sumo cuatro acciones y son siempre las mismas cuatro. Mover el hueco <code>arriba</code> se ve en el tablero como una ficha que baja.</p>
+<p>Una acción mueve <strong>el hueco</strong>, no la ficha. Es la convención del libro y simplifica el problema: hay a lo sumo cuatro acciones y son siempre las mismas cuatro, en vez de ocho fichas cada una con sus movimientos posibles.</p>
+<p>Sobre la tupla, mover el hueco es intercambiarlo con la casilla que está a un salto de distancia:</p>
+<pre><code>arriba -3      abajo +3      izquierda -1      derecha +1</code></pre>
+<p><code>ACTIONS</code> devuelve solo las que no se caen del tablero: con el hueco en un borde son tres, en una esquina dos. Ojo con el nombre al mirar el tablero: mover el hueco <code>arriba</code> se ve como una ficha que baja.</p>
 </section>
 <section id="los-tableros-de-esta-clase" class="level3">
 <h3 class="anchored" data-anchor-id="los-tableros-de-esta-clase">Los tableros de esta clase</h3>
-<p>Dos, y por razones distintas.</p>
+<p>Vamos a usar dos, y cada uno sirve para una cosa distinta:</p>
+<ul>
+<li><strong>CHICO</strong>: a cuatro movimientos del objetivo. Es el que se puede mirar paso a paso, porque los árboles de búsqueda entran en la pantalla.</li>
+<li><strong>FIGURA_34</strong>: el de la figura 3.4 del libro, a veintiún movimientos. Ahí no hay nada para mirar, pero es donde los números se separan.</li>
+</ul>
 <div id="3e298f4e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.362153Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.361704Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.366897Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.365463Z&quot;}}" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>CHICO <span class="op">=</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>,</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>         <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">5</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>         <span class="dv">7</span>, <span class="dv">6</span>, <span class="dv">0</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># El de la figura 3.4 del libro. Veintiun movimientos: sirve para la</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># tabla de numeros, no para mirar paso a paso.</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>FIGURA_34 <span class="op">=</span> (<span class="dv">7</span>, <span class="dv">2</span>, <span class="dv">4</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>             <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">6</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>             <span class="dv">8</span>, <span class="dv">3</span>, <span class="dv">1</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>CHICO <span class="op">=</span> (<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>         <span class="dv">4</span>, <span class="dv">8</span>, <span class="dv">5</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>         <span class="dv">7</span>, <span class="dv">6</span>, <span class="dv">0</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># El de la figura 3.4 del libro. Veintiun movimientos: sirve para la</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># tabla de numeros, no para mirar paso a paso.</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>FIGURA_34 <span class="op">=</span> (<span class="dv">7</span>, <span class="dv">2</span>, <span class="dv">4</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>             <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">6</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>             <span class="dv">8</span>, <span class="dv">3</span>, <span class="dv">1</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div id="b039f9c5" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.369855Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.369613Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.374573Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.373898Z&quot;}}" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> puzzle <span class="im">import</span> lado_a_lado, tablero</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(lado_a_lado(CHICO, GOAL))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> puzzle <span class="im">import</span> lado_a_lado, tablero</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(lado_a_lado(CHICO, GOAL))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>1 2 3   -&gt;   1 2 3
 4 8 5   -&gt;   4 5 6
@@ -294,19 +305,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="la-interfaz-sobre-el-tablero-chico" class="level3">
 <h3 class="anchored" data-anchor-id="la-interfaz-sobre-el-tablero-chico">La interfaz, sobre el tablero chico</h3>
-<p>El hueco arranca abajo a la derecha, que es su lugar en el objetivo. Para resolver el tablero <strong>tiene que salir de ahí y volver</strong>: no se puede ir derecho.</p>
+<p>Probamos las tres funciones sobre <code>CHICO</code>, igual que hicimos con el mapa de Rumania.</p>
+<p>El hueco arranca abajo a la derecha, que es justo su lugar en el objetivo. Para resolver el tablero <strong>tiene que salir de ahí y volver</strong>: no se puede ir derecho, y por eso la solución son cuatro movimientos y no dos.</p>
 <div id="b7d9a280" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.378552Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.378204Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.382500Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.381696Z&quot;}}" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>problem <span class="op">=</span> EightPuzzle(CHICO)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"INITIAL"</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tablero(problem.INITIAL))</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ACTIONS  "</span>, problem.ACTIONS(CHICO))</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RESULT(INITIAL, 'izquierda')"</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tablero(problem.RESULT(CHICO, <span class="st">"izquierda"</span>)))</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"IS_GOAL(INITIAL) "</span>, problem.IS_GOAL(CHICO))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>problem <span class="op">=</span> EightPuzzle(CHICO)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"INITIAL"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tablero(problem.INITIAL))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"ACTIONS  "</span>, problem.ACTIONS(CHICO))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"RESULT(INITIAL, 'izquierda')"</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tablero(problem.RESULT(CHICO, <span class="st">"izquierda"</span>)))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"IS_GOAL(INITIAL) "</span>, problem.IS_GOAL(CHICO))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>INITIAL
 1 2 3
@@ -323,7 +335,8 @@ RESULT(INITIAL, 'izquierda')
 IS_GOAL(INITIAL)  False</code></pre>
 </div>
 </div>
-<p>Nótese lo que <strong>no</strong> hay: ningún diccionario de vecinos. En Rumania las 23 rutas están escritas una por una. Acá el grafo no existe en ningún lado: <code>ACTIONS</code> lo calcula en el momento, cada vez. Los 181.440 estados alcanzables nunca están todos juntos en memoria.</p>
+<p>Tener en cuenta lo que <strong>no</strong> hay: ningún diccionario de vecinos. En Rumania las 23 rutas están escritas una por una y <code>ACTIONS</code> las lee del mapa. Acá el grafo no existe en ningún lado: <code>ACTIONS</code> calcula los vecinos en el momento, cada vez que se lo llama, con una cuenta sobre la tupla.</p>
+<p>Los tableros posibles son las 9! = 362.880 permutaciones de nueve casillas, y desde uno dado se llega a la mitad: <strong>181.440 estados</strong>. Ninguno de ellos está escrito en ninguna parte, y nunca están todos juntos en memoria.</p>
 <p>Esa es la primera cosa que el mapa escondía.</p>
 <hr>
 </section>
@@ -332,41 +345,42 @@ IS_GOAL(INITIAL)  False</code></pre>
 <h2 class="anchored" data-anchor-id="parte-2">Parte 2</h2>
 <p>Los mismos cinco algoritmos</p>
 <div id="1c2fe4b2" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.385384Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.384993Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.393680Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.392496Z&quot;}}" data-execution_count="5">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> html <span class="im">import</span> escape</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> HTML</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> web_puzzle <span class="im">import</span> WebPuzzle</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ver(view, alto<span class="op">=</span><span class="dv">820</span>):</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Mete la pagina que grabo el view adentro de esta celda."""</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> HTML(<span class="ss">f'&lt;div&gt;&lt;iframe srcdoc="</span><span class="sc">{</span>escape(view.html(), quote<span class="op">=</span><span class="va">True</span>)<span class="sc">}</span><span class="ss">" '</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f'style="width:100%; height:</span><span class="sc">{</span>alto<span class="sc">}</span><span class="ss">px; border:1px solid #dee2e6; '</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f'border-radius:.25rem" title="la busqueda paso a paso"&gt;&lt;/iframe&gt;&lt;/div&gt;'</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> html <span class="im">import</span> escape</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> HTML</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> web_puzzle <span class="im">import</span> WebPuzzle</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ver(view, alto<span class="op">=</span><span class="dv">820</span>):</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Mete la pagina que grabo el view adentro de esta celda."""</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> HTML(<span class="ss">f'&lt;div&gt;&lt;iframe srcdoc="</span><span class="sc">{</span>escape(view.html(), quote<span class="op">=</span><span class="va">True</span>)<span class="sc">}</span><span class="ss">" '</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f'style="width:100%; height:</span><span class="sc">{</span>alto<span class="sc">}</span><span class="ss">px; border:1px solid #dee2e6; '</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f'border-radius:.25rem" title="la busqueda paso a paso"&gt;&lt;/iframe&gt;&lt;/div&gt;'</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><code>WebPuzzle</code> hereda de <code>Web</code>, el mismo grabador que usa Rumania. Le cambia dos cosas: no manda el mapa —acá no hay ciudades con coordenadas— y usa una plantilla que dibuja tableros de 3×3 donde la otra dibujaba nombres de ciudades. Todo lo demás se recicla, incluido lo más delicado: decidir si un hijo es nuevo, una mejora o un descarte.</p>
-<p>Cada página tiene dos vistas, con el switch de arriba a la derecha:</p>
+<p><code>WebPuzzle</code> hereda de <code>Web</code>, el mismo grabador que usa Rumania. Le cambia dos cosas: no manda el mapa —acá no hay ciudades con coordenadas— y usa una plantilla que dibuja tableros de 3×3 donde la otra dibujaba nombres de ciudades. Todo lo demás se recicla, incluido decidir si un hijo es nuevo, una mejora o un descarte.</p>
+<p>Cada página se recorre paso a paso y tiene dos vistas, con el switch de arriba a la derecha:</p>
 <ul>
-<li><strong>tablero</strong> — el estado de ahora y los estados a los que puede ir. Es lo que se ve sin saber nada de la historia de la búsqueda, y es el equivalente del mapa de Rumania. La ficha resaltada es la que se movió, así que la acción se lee sola.</li>
-<li><strong>árbol</strong> — todo lo que la búsqueda construyó hasta ese paso. Ahí se ve la diferencia entre un algoritmo y otro, que en el tablero no se ve.</li>
+<li><strong>tablero</strong>: el estado de ahora y los estados a los que puede ir. Es el equivalente del mapa de Rumania, lo que se ve sin saber nada de la historia de la búsqueda. La ficha resaltada es la que se movió, así que la acción se lee sola.</li>
+<li><strong>árbol</strong>: todo lo que la búsqueda construyó hasta ese paso. Ahí se ve la diferencia entre un algoritmo y otro, que en el tablero no se ve.</li>
 </ul>
-<p>Las páginas arrancan en <strong>tablero</strong>. El árbol se prende cuando hace falta comparar.</p>
+<p>Las páginas arrancan en <strong>tablero</strong>; el árbol conviene prenderlo para comparar un algoritmo con otro.</p>
 <section id="búsqueda-en-amplitud" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="búsqueda-en-amplitud">2.1 Búsqueda en amplitud</h3>
-<p>Cola FIFO, prueba de objetivo al generar. Recorre el árbol por niveles, así que devuelve la solución con menos movimientos.</p>
+<h3 class="anchored" data-anchor-id="búsqueda-en-amplitud">2.1 — Búsqueda en amplitud</h3>
+<p>La frontera es una cola <strong>FIFO</strong>: se toman primero los nodos más antiguos, así que el árbol se recorre por niveles. Se evalúa si se llegó al objetivo <strong>al generar</strong> los hijos, y se corta ahí.</p>
+<p>Acá todos los movimientos cuestan 1, que es justo la condición para que eso sea óptimo: cuando aparece el objetivo, los niveles anteriores ya se recorrieron enteros, así que no puede haber una solución con menos movimientos.</p>
 <div id="9e434073" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.396432Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.396193Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.403320Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.402169Z&quot;}}" data-execution_count="6">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> breadth_first_search <span class="im">import</span> breadth_first_search</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> node <span class="im">import</span> depth, path_states</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>amplitud <span class="op">=</span> WebPuzzle(problem, <span class="st">"BREADTH-FIRST-SEARCH"</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"cola FIFO, objetivo al generar"</span>,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                     key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>solucion_amplitud <span class="op">=</span> breadth_first_search(problem, view<span class="op">=</span>amplitud)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(lado_a_lado(<span class="op">*</span>path_states(solucion_amplitud)))</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">costo: </span><span class="sc">{</span>solucion_amplitud<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   expande: </span><span class="sc">{</span>amplitud<span class="sc">.</span>pops<span class="sc">}</span><span class="ss"> nodos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> breadth_first_search <span class="im">import</span> breadth_first_search</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> node <span class="im">import</span> depth, path_states</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>amplitud <span class="op">=</span> WebPuzzle(problem, <span class="st">"BREADTH-FIRST-SEARCH"</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                     <span class="st">"cola FIFO, objetivo al generar"</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                     key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>solucion_amplitud <span class="op">=</span> breadth_first_search(problem, view<span class="op">=</span>amplitud)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(lado_a_lado(<span class="op">*</span>path_states(solucion_amplitud)))</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">costo: </span><span class="sc">{</span>solucion_amplitud<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   expande: </span><span class="sc">{</span>amplitud<span class="sc">.</span>pops<span class="sc">}</span><span class="ss"> nodos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>1 2 3   -&gt;   1 2 3   -&gt;   1 2 3   -&gt;   1 2 3   -&gt;   1 2 3
 4 8 5   -&gt;   4 8 5   -&gt;   4 _ 5   -&gt;   4 5 _   -&gt;   4 5 6
@@ -376,7 +390,7 @@ costo: 4   expande: 13 nodos</code></pre>
 </div>
 </div>
 <div id="f69b6b7e" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.406380Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.406116Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.424752Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.423452Z&quot;}}" data-execution_count="7">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ver(amplitud)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ver(amplitud)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display column-screen-inset" data-execution_count="7">
 <div><iframe srcdoc="<title>8-puzzle</title>
 <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
@@ -1124,27 +1138,30 @@ mostrar(0);
 " style="width:100%; height:820px; border:1px solid #dee2e6; border-radius:.25rem" title="la busqueda paso a paso"></iframe></div>
 </div>
 </div>
-<p>En el árbol se ven los niveles completos, uno abajo del otro, y también los tableros que ya habían aparecido antes: quedan de gris y con el borde punteado. Son los que <code>reached</code> descarta.</p>
+<p>Encontró la solución de <strong>4 movimientos</strong> expandiendo 13 nodos.</p>
+<p>En el árbol se ven los niveles completos, uno abajo del otro, y también los tableros que ya habían aparecido antes: quedan de gris y con el borde punteado. Son los que <code>reached</code> descarta. Como acá <code>reached</code> es un <strong>conjunto de estados</strong> y no un diccionario de nodos, alcanza con haber visto el tablero una vez para no volver a mirarlo.</p>
 </section>
-<section id="costo-uniforme" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="costo-uniforme">2.2 Costo uniforme</h3>
-<p><code>best_first_search</code> con f(n) = g(n). Como todos los movimientos cuestan 1, devuelve el mismo camino que búsqueda en amplitud. La diferencia queda en otro lado.</p>
+<section id="costo-uniforme-dijkstra" class="level3 page-columns page-full">
+<h3 class="anchored" data-anchor-id="costo-uniforme-dijkstra">2.2 — Costo uniforme (Dijkstra)</h3>
+<p>El mismo <code>best_first_search</code> de siempre, con <strong>f(n) = g(n)</strong>: se expande el nodo con el camino de menor costo encontrado hasta ahora, y el objetivo se prueba <strong>al sacarlo</strong> de la cola.</p>
+<p>En Rumania esto daba un camino distinto al de amplitud, porque las rutas tenían kilómetros distintos. Acá todos los movimientos cuestan 1, así que g(n) es la profundidad y las dos búsquedas recorren el árbol en el mismo orden: van a devolver el mismo camino.</p>
 <div id="db067e43" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.428363Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.428121Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.434643Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.433610Z&quot;}}" data-execution_count="8">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> best_first_search <span class="im">import</span> best_first_search, g</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>uniforme <span class="op">=</span> WebPuzzle(problem, <span class="st">"BEST-FIRST-SEARCH"</span>, <span class="st">"f(n) = g(n)"</span>, key<span class="op">=</span>g)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>solucion_uniforme <span class="op">=</span> best_first_search(problem, g, view<span class="op">=</span>uniforme)</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"amplitud   costo </span><span class="sc">{</span>solucion_amplitud<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   expande </span><span class="sc">{</span>amplitud<span class="sc">.</span>pops<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"uniforme   costo </span><span class="sc">{</span>solucion_uniforme<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   expande </span><span class="sc">{</span>uniforme<span class="sc">.</span>pops<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> best_first_search <span class="im">import</span> best_first_search, g</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>uniforme <span class="op">=</span> WebPuzzle(problem, <span class="st">"BEST-FIRST-SEARCH"</span>, <span class="st">"f(n) = g(n)"</span>, key<span class="op">=</span>g)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>solucion_uniforme <span class="op">=</span> best_first_search(problem, g, view<span class="op">=</span>uniforme)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"amplitud   costo </span><span class="sc">{</span>solucion_amplitud<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   expande </span><span class="sc">{</span>amplitud<span class="sc">.</span>pops<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"uniforme   costo </span><span class="sc">{</span>solucion_uniforme<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   expande </span><span class="sc">{</span>uniforme<span class="sc">.</span>pops<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>amplitud   costo 4   expande 13
 uniforme   costo 4   expande 26</code></pre>
 </div>
 </div>
+<p>Mismo camino de 4 movimientos, pero <strong>13 nodos contra 26</strong>: costo uniforme expandió el doble. ¿Por qué, si los dos recorren el árbol en el mismo orden?</p>
 <div id="e4c30f6e" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.436411Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.436202Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.446782Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.445370Z&quot;}}" data-execution_count="9">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ver(uniforme)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>ver(uniforme)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display column-screen-inset" data-execution_count="9">
 <div><iframe srcdoc="<title>8-puzzle</title>
 <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
@@ -1892,52 +1909,59 @@ mostrar(0);
 " style="width:100%; height:820px; border:1px solid #dee2e6; border-radius:.25rem" title="la busqueda paso a paso"></iframe></div>
 </div>
 </div>
-<p>Mismo camino, el doble de nodos expandidos. La razón es la prueba de objetivo: búsqueda en amplitud la hace <strong>al generar</strong> el hijo y corta ahí; costo uniforme la hace <strong>al sacarlo</strong> de la cola, así que primero termina de expandir todo lo que costaba menos.</p>
-<p>En Rumania esta comparación no se podía hacer, porque ahí las dos búsquedas daban caminos distintos (450 km contra 418) y la conversación se iba a cuál era mejor. Acá dan el mismo, y lo único que queda para comparar es el trabajo.</p>
+<p>La razón es la prueba de objetivo. Búsqueda en amplitud la hace <strong>al generar</strong> el hijo y corta ahí; costo uniforme la hace <strong>al sacarlo</strong> de la cola, así que antes de llegar a mirarlo termina de expandir todo lo que costaba menos.</p>
+<p>En Rumania esta comparación no se podía hacer, porque ahí las dos búsquedas daban caminos distintos —450 km contra 418— y la conversación se iba a cuál era mejor. Acá dan el mismo, y lo único que queda para comparar es el trabajo.</p>
 </section>
 <section id="búsqueda-en-profundidad" class="level3">
-<h3 class="anchored" data-anchor-id="búsqueda-en-profundidad">2.3 Búsqueda en profundidad</h3>
-<p>Acá se rompe. No es que tarde: <strong>no vuelve.</strong></p>
+<h3 class="anchored" data-anchor-id="búsqueda-en-profundidad">2.3 — Búsqueda en profundidad</h3>
+<p>Cambiamos la FIFO por una <strong>LIFO</strong> y sacamos <code>reached</code>, igual que en Rumania: se toma siempre el último hijo generado, así que la búsqueda profundiza en una rama en vez de un nivel.</p>
+<p>En Rumania esto daba una solución mala —575 km, 7 ciudades— pero la daba. Acá no termina: hay que cortarla a mano para poder mirar qué estuvo haciendo.</p>
 <div id="36851296" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.450557Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.450290Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.560555Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.559791Z&quot;}}" data-execution_count="10">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> depth_first_search <span class="im">import</span> depth_first_search</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> puzzle <span class="im">import</span> Contador, Tope</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>profundidad <span class="op">=</span> Contador(tope<span class="op">=</span><span class="dv">1_000</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    depth_first_search(problem, view<span class="op">=</span>profundidad)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"termino"</span>)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> Tope:</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"cortada a mano despues de </span><span class="sc">{</span>profundidad<span class="sc">.</span>pops<span class="sc">}</span><span class="ss"> expansiones"</span>)</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"el nodo mas hondo estaba a </span><span class="sc">{</span>profundidad<span class="sc">.</span>hondo<span class="sc">}</span><span class="ss"> movimientos del inicio"</span>)</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"y el tablero se resuelve en </span><span class="sc">{</span>solucion_amplitud<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> depth_first_search <span class="im">import</span> depth_first_search</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> puzzle <span class="im">import</span> Contador, Tope</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>profundidad <span class="op">=</span> Contador(tope<span class="op">=</span><span class="dv">1_000</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    depth_first_search(problem, view<span class="op">=</span>profundidad)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"termino"</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> Tope:</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"cortada a mano despues de </span><span class="sc">{</span>profundidad<span class="sc">.</span>pops<span class="sc">}</span><span class="ss"> expansiones"</span>)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"el nodo mas hondo estaba a </span><span class="sc">{</span>profundidad<span class="sc">.</span>hondo<span class="sc">}</span><span class="ss"> movimientos del inicio"</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"y el tablero se resuelve en </span><span class="sc">{</span>solucion_amplitud<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>cortada a mano despues de 1000 expansiones
 el nodo mas hondo estaba a 633 movimientos del inicio
 y el tablero se resuelve en 4</code></pre>
 </div>
 </div>
-<p>La pila LIFO baja por una rama y no sube nunca. <code>IS_CYCLE</code> mira solo los 30 ancestros más cercanos, y con 181.440 estados eso no alcanza para nada: la búsqueda se va a pasear y no encuentra el borde del espacio, porque no lo hay.</p>
-<p>En Rumania esto no pasaba. Con 20 ciudades, bajar 30 niveles ya obliga a repetir alguna, <code>IS_CYCLE</code> corta y la búsqueda vuelve. La segunda cosa que el mapa escondía: <strong>búsqueda en profundidad depende de que el espacio sea chico</strong>, y eso no está escrito en ninguna parte del algoritmo.</p>
+<p>Después de mil expansiones el nodo más hondo estaba a <strong>633 movimientos</strong> del inicio, y el tablero se resuelve en 4.</p>
+<p>La pila LIFO baja por una rama y no sube nunca. <code>IS_CYCLE</code> mira solo los 30 ancestros más cercanos, y con 181.440 estados eso no alcanza: para que se dispare, la búsqueda tiene que volver a uno de los últimos 30 tableros, y siempre tiene otro para donde seguir.</p>
+<p>En Rumania esto no pasaba. Con 20 ciudades, bajar 30 niveles obliga a repetir alguna, <code>IS_CYCLE</code> corta y la búsqueda vuelve a subir. Esa es la segunda cosa que el mapa escondía: <strong>la búsqueda en profundidad depende de que el espacio sea chico</strong>, y eso no está escrito en ninguna parte del algoritmo.</p>
 <p>Por eso el libro no la presenta sola, sino como el caso <code>l = ∞</code> de la que sigue.</p>
 </section>
 <section id="profundidad-limitada" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="profundidad-limitada">2.4 Profundidad limitada</h3>
-<p>La misma búsqueda, con un límite. El límite es lo único que hace que termine.</p>
+<h3 class="anchored" data-anchor-id="profundidad-limitada">2.4 — Profundidad limitada</h3>
+<p>La misma búsqueda en profundidad, con un techo <code>l</code>: no se expande nada más hondo que eso. Es lo único que cambia, y es lo único que hace que termine.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> depth(node) <span class="op">&gt;</span> l:       <span class="co"># &lt;- el techo</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> cutoff       <span class="co"># &lt;- no encontro, pero podria haber mas abajo</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> <span class="kw">not</span> is_cycle(node):</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    ...</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Con <code>l = 5</code> la solución de 4 movimientos entra debajo del límite. Con <code>l = 3</code> daría <code>cutoff</code>: la respuesta está más abajo del techo.</p>
 <div id="7f977df5" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.562551Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.562332Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.567716Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.566816Z&quot;}}" data-execution_count="11">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> depth_first_search <span class="im">import</span> depth_limited_search</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>limitada <span class="op">=</span> WebPuzzle(problem, <span class="st">"DEPTH-LIMITED-SEARCH"</span>, <span class="st">"pila LIFO, l = 5"</span>,</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                     key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>solucion_limitada <span class="op">=</span> depth_limited_search(problem, <span class="dv">5</span>, view<span class="op">=</span>limitada)</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"costo: </span><span class="sc">{</span>solucion_limitada<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   expande: </span><span class="sc">{</span>limitada<span class="sc">.</span>pops<span class="sc">}</span><span class="ss"> nodos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> depth_first_search <span class="im">import</span> depth_limited_search</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>limitada <span class="op">=</span> WebPuzzle(problem, <span class="st">"DEPTH-LIMITED-SEARCH"</span>, <span class="st">"pila LIFO, l = 5"</span>,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                     key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>solucion_limitada <span class="op">=</span> depth_limited_search(problem, <span class="dv">5</span>, view<span class="op">=</span>limitada)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"costo: </span><span class="sc">{</span>solucion_limitada<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   expande: </span><span class="sc">{</span>limitada<span class="sc">.</span>pops<span class="sc">}</span><span class="ss"> nodos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>costo: 4   expande: 51 nodos</code></pre>
 </div>
 </div>
 <div id="20aaebea" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.569962Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.569710Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.578129Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.577347Z&quot;}}" data-execution_count="12">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>ver(limitada)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>ver(limitada)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display column-screen-inset" data-execution_count="12">
 <div><iframe srcdoc="<title>8-puzzle</title>
 <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
@@ -2685,28 +2709,30 @@ mostrar(0);
 " style="width:100%; height:820px; border:1px solid #dee2e6; border-radius:.25rem" title="la busqueda paso a paso"></iframe></div>
 </div>
 </div>
-<p>Vale la pena recorrer esta página hasta el fondo: se ve bajar hasta el límite, frenar —el aviso rojo <code>pasa el limite l = 5: no se expande</code>— y volver a subir a probar otra rama. El árbol crece para abajo y a lo ancho al mismo tiempo.</p>
-<p>Con <code>l = 5</code> encuentra la solución de 4 movimientos. Con <code>l = 3</code> daría <code>cutoff</code>: la respuesta está más abajo del límite.</p>
+<p>Encontró la solución de <strong>4 movimientos</strong>, expandiendo 51 nodos: cuatro veces más que búsqueda en amplitud, para el mismo camino.</p>
+<p>Conviene recorrer esta página hasta el fondo. Se ve bajar hasta el límite, frenar —el aviso rojo <code>pasa el limite l = 5: no se expande</code>— y volver a subir a probar otra rama. El árbol crece para abajo y a lo ancho al mismo tiempo, que es la diferencia con los niveles prolijos de la búsqueda en amplitud.</p>
 </section>
 <section id="profundidad-iterativa" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="profundidad-iterativa">2.5 Profundidad iterativa</h3>
-<p>Profundidad limitada con l = 0, 1, 2, … hasta que deja de dar <code>cutoff</code>. Memoria de búsqueda en profundidad, respuesta de búsqueda en amplitud.</p>
+<h3 class="anchored" data-anchor-id="profundidad-iterativa">2.5 — Profundidad iterativa</h3>
+<p>Búsqueda en profundidad limitada, pero probando <code>l = 0, 1, 2, ...</code> hasta que deja de dar <code>cutoff</code>. Se queda con lo mejor de los dos lados: la memoria de la búsqueda en profundidad —lineal con la profundidad— y la garantía de la búsqueda en amplitud de encontrar primero la solución más superficial.</p>
+<p>Acá el objetivo está a 4 movimientos, así que va a dar cinco vueltas: de <code>l = 0</code> a <code>l = 4</code>.</p>
 <div id="c05a3071" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.581407Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.581192Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.587816Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.586691Z&quot;}}" data-execution_count="13">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> iterative_deepening_search <span class="im">import</span> iterative_deepening_search</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>iterativa <span class="op">=</span> WebPuzzle(problem, <span class="st">"ITERATIVE-DEEPENING-SEARCH"</span>,</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"depth-limited con l = 0, 1, 2, ..."</span>,</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                      key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>solucion_iterativa <span class="op">=</span> iterative_deepening_search(problem, view<span class="op">=</span>iterativa)</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"costo: </span><span class="sc">{</span>solucion_iterativa<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   expande: </span><span class="sc">{</span>iterativa<span class="sc">.</span>pops<span class="sc">}</span><span class="ss"> nodos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> iterative_deepening_search <span class="im">import</span> iterative_deepening_search</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>iterativa <span class="op">=</span> WebPuzzle(problem, <span class="st">"ITERATIVE-DEEPENING-SEARCH"</span>,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"depth-limited con l = 0, 1, 2, ..."</span>,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                      key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>solucion_iterativa <span class="op">=</span> iterative_deepening_search(problem, view<span class="op">=</span>iterativa)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"costo: </span><span class="sc">{</span>solucion_iterativa<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   expande: </span><span class="sc">{</span>iterativa<span class="sc">.</span>pops<span class="sc">}</span><span class="ss"> nodos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>costo: 4   expande: 51 nodos</code></pre>
 </div>
 </div>
+<p>Devolvió lo mismo que la búsqueda en amplitud: 4 movimientos. Pero expandió <strong>51 nodos en vez de 13</strong>. ¿Por qué?</p>
 <div id="61e13635" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.590268Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.590019Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.598041Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.597324Z&quot;}}" data-execution_count="14">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>ver(iterativa)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>ver(iterativa)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display column-screen-inset" data-execution_count="14">
 <div><iframe srcdoc="<title>8-puzzle</title>
 <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
@@ -3454,30 +3480,32 @@ mostrar(0);
 " style="width:100%; height:820px; border:1px solid #dee2e6; border-radius:.25rem" title="la busqueda paso a paso"></iframe></div>
 </div>
 </div>
-<p>En el riel de arriba se ven las vueltas separadas, y el árbol se rehace de cero en cada una: eso es exactamente lo que hace el algoritmo. Expande casi cuatro veces más nodos que búsqueda en amplitud y llega a la misma respuesta. Lo que compra con esa diferencia es memoria.</p>
+<p>En el riel de arriba se ven las vueltas separadas, y el árbol se rehace de cero en cada una: eso es exactamente lo que hace el algoritmo, y ahí están los nodos de más.</p>
+<p>Rehacer el trabajo parece un desperdicio, pero no lo es tanto: el último nivel tiene más nodos que todos los anteriores juntos, así que la última vuelta pesa más que todas las otras sumadas. Lo que compra a cambio es memoria. Nunca tiene más de <code>l</code> niveles en la pila, mientras que la búsqueda en amplitud guarda un nivel entero.</p>
 </section>
 <section id="búsqueda-bidireccional" class="level3 page-columns page-full">
-<h3 class="anchored" data-anchor-id="búsqueda-bidireccional">2.6 Búsqueda bidireccional</h3>
-<p>Dos búsquedas a la vez, una desde el tablero inicial y otra desde el objetivo, hasta que se cruzan.</p>
+<h3 class="anchored" data-anchor-id="búsqueda-bidireccional">2.6 — Búsqueda bidireccional</h3>
+<p>Dos búsquedas a la vez: una que sale del tablero inicial y otra que sale del objetivo, hasta que se cruzan en algún tablero del medio.</p>
+<p>El problema de atrás es el mismo <code>EightPuzzle</code> con <code>INITIAL</code> y <code>GOAL</code> cambiados de lugar. En vez de un árbol de profundidad 4, dos de profundidad 2.</p>
 <div id="fc8df473" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.601239Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.601033Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.607979Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.606687Z&quot;}}" data-execution_count="15">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bidirectional_search <span class="im">import</span> bidirectional_search</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>problem_b <span class="op">=</span> EightPuzzle(GOAL, CHICO)   <span class="co"># el mismo problema, al reves</span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>bidireccional <span class="op">=</span> WebPuzzle(problem, <span class="st">"BIBF-SEARCH"</span>, <span class="st">"dos frentes, f(n) = g(n)"</span>,</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                          key<span class="op">=</span><span class="kw">lambda</span> node: node.PATH_COST, key_name<span class="op">=</span><span class="st">"g"</span>)</span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>solucion_bidireccional <span class="op">=</span> bidirectional_search(problem, problem_b,</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                                              view<span class="op">=</span>bidireccional)</span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"costo: </span><span class="sc">{</span>solucion_bidireccional<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   "</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"expande: </span><span class="sc">{</span>bidireccional<span class="sc">.</span>pops<span class="sc">}</span><span class="ss"> nodos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> bidirectional_search <span class="im">import</span> bidirectional_search</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>problem_b <span class="op">=</span> EightPuzzle(GOAL, CHICO)   <span class="co"># el mismo problema, al reves</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>bidireccional <span class="op">=</span> WebPuzzle(problem, <span class="st">"BIBF-SEARCH"</span>, <span class="st">"dos frentes, f(n) = g(n)"</span>,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                          key<span class="op">=</span><span class="kw">lambda</span> node: node.PATH_COST, key_name<span class="op">=</span><span class="st">"g"</span>)</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>solucion_bidireccional <span class="op">=</span> bidirectional_search(problem, problem_b,</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>                                              view<span class="op">=</span>bidireccional)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"costo: </span><span class="sc">{</span>solucion_bidireccional<span class="sc">.</span>PATH_COST<span class="sc">}</span><span class="ss">   "</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>      <span class="ss">f"expande: </span><span class="sc">{</span>bidireccional<span class="sc">.</span>pops<span class="sc">}</span><span class="ss"> nodos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>costo: 4   expande: 10 nodos</code></pre>
 </div>
 </div>
 <div id="9a798588" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.610621Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.610288Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.616928Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.616138Z&quot;}}" data-execution_count="16">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>ver(bidireccional)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ver(bidireccional)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display column-screen-inset" data-execution_count="16">
 <div><iframe srcdoc="<title>8-puzzle</title>
 <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
@@ -4225,7 +4253,9 @@ mostrar(0);
 " style="width:100%; height:820px; border:1px solid #dee2e6; border-radius:.25rem" title="la busqueda paso a paso"></iframe></div>
 </div>
 </div>
-<p>Acá hay una suerte que conviene decir en voz alta: <strong>el 8-puzzle se puede dar vuelta.</strong> Toda acción se deshace con otra acción, así que el problema inverso es el mismo problema con <code>INITIAL</code> y <code>GOAL</code> cambiados de lugar. Cuando eso no pasa —cuando una acción no se puede deshacer— hay que construir el problema inverso a mano, y a veces directamente no se puede. Esa es la limitación real de la búsqueda bidireccional, y no se ve en ninguno de los dos ejemplos que estamos usando.</p>
+<p>Encontró la solución de <strong>4 movimientos</strong> expandiendo 10 nodos: menos que cualquiera de los otros cuatro.</p>
+<p>Conviene decir en voz alta algo que este problema regala: <strong>el 8-puzzle se puede dar vuelta.</strong> Toda acción se deshace con otra acción, así que el problema inverso es el mismo problema con <code>INITIAL</code> y <code>GOAL</code> cambiados de lugar, y esa es la línea entera que hubo que escribir para tenerlo.</p>
+<p>Cuando una acción no se puede deshacer, el problema inverso hay que construirlo a mano, y a veces directamente no se puede. Esa es la limitación real de la búsqueda bidireccional, y no se ve en ninguno de los dos ejemplos que usamos en estas dos clases.</p>
 <hr>
 </section>
 </section>
@@ -4233,20 +4263,20 @@ mostrar(0);
 <h2 class="anchored" data-anchor-id="parte-3">Parte 3</h2>
 <p>Comparación</p>
 <div id="0962526e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.619144Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.618954Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.624885Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.623928Z&quot;}}" data-execution_count="17">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>resultados <span class="op">=</span> [</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"búsqueda en amplitud"</span>,    solucion_amplitud,      amplitud),</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"costo uniforme"</span>,          solucion_uniforme,      uniforme),</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"profundidad limitada"</span>,    solucion_limitada,      limitada),</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"profundidad iterativa"</span>,   solucion_iterativa,     iterativa),</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"búsqueda bidireccional"</span>,  solucion_bidireccional, bidireccional),</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co"># El costo del camino es la cantidad de movimientos: cada uno cuesta 1.</span></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'algoritmo'</span><span class="sc">:&lt;25}{</span><span class="st">'movimientos'</span><span class="sc">:&gt;13}{</span><span class="st">'expande'</span><span class="sc">:&gt;9}</span><span class="ss">"</span>)</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">47</span>)</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> nombre, solucion, view <span class="kw">in</span> resultados:</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>nombre<span class="sc">:&lt;25}{</span><span class="bu">len</span>(path_states(solucion)) <span class="op">-</span> <span class="dv">1</span><span class="sc">:&gt;13}{</span>view<span class="sc">.</span>pops<span class="sc">:&gt;9}</span><span class="ss">"</span>)</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'búsqueda en profundidad'</span><span class="sc">:&lt;25}{</span><span class="st">'no termina'</span><span class="sc">:&gt;13}{</span><span class="st">'-'</span><span class="sc">:&gt;9}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>resultados <span class="op">=</span> [</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"búsqueda en amplitud"</span>,    solucion_amplitud,      amplitud),</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"costo uniforme"</span>,          solucion_uniforme,      uniforme),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"profundidad limitada"</span>,    solucion_limitada,      limitada),</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"profundidad iterativa"</span>,   solucion_iterativa,     iterativa),</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"búsqueda bidireccional"</span>,  solucion_bidireccional, bidireccional),</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co"># El costo del camino es la cantidad de movimientos: cada uno cuesta 1.</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'algoritmo'</span><span class="sc">:&lt;25}{</span><span class="st">'movimientos'</span><span class="sc">:&gt;13}{</span><span class="st">'expande'</span><span class="sc">:&gt;9}</span><span class="ss">"</span>)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">47</span>)</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> nombre, solucion, view <span class="kw">in</span> resultados:</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>nombre<span class="sc">:&lt;25}{</span><span class="bu">len</span>(path_states(solucion)) <span class="op">-</span> <span class="dv">1</span><span class="sc">:&gt;13}{</span>view<span class="sc">.</span>pops<span class="sc">:&gt;9}</span><span class="ss">"</span>)</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'búsqueda en profundidad'</span><span class="sc">:&lt;25}{</span><span class="st">'no termina'</span><span class="sc">:&gt;13}{</span><span class="st">'-'</span><span class="sc">:&gt;9}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>algoritmo                  movimientos  expande
 -----------------------------------------------
@@ -4258,12 +4288,18 @@ búsqueda bidireccional               4       10
 búsqueda en profundidad     no termina        -</code></pre>
 </div>
 </div>
-<p>Los cinco que terminan dan la misma respuesta, cuatro movimientos, y expanden entre 10 y 51 nodos. Con un tablero a cuatro movimientos del objetivo la diferencia es chica. Vale la pena mirarla en el tablero del libro.</p>
+<p>Observaciones:</p>
+<ul>
+<li>los cinco que terminan dan <strong>la misma respuesta</strong>, cuatro movimientos: con costos uniformes cualquiera de ellos encuentra el óptimo;</li>
+<li>lo que los separa es el trabajo, entre <strong>10 y 51 expansiones</strong>;</li>
+<li><strong>búsqueda en profundidad</strong> no da respuesta.</li>
+</ul>
+<p>Con un tablero a cuatro movimientos del objetivo esas diferencias son chicas. Repitamos la tabla sobre el tablero del libro, que está a veintiuno.</p>
 <div id="e40250fa" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.628316Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.628000Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:42.220208Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:42.219354Z&quot;}}" data-execution_count="18">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> puzzle <span class="im">import</span> FIGURA_34, imprimir</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>imprimir(FIGURA_34, tope<span class="op">=</span><span class="dv">200_000</span>,</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>         titulo<span class="op">=</span><span class="st">"Figura 3.4 del libro: a veintiun movimientos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> puzzle <span class="im">import</span> FIGURA_34, imprimir</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>imprimir(FIGURA_34, tope<span class="op">=</span><span class="dv">200_000</span>,</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>         titulo<span class="op">=</span><span class="st">"Figura 3.4 del libro: a veintiun movimientos"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Figura 3.4 del libro: a veintiun movimientos
 
@@ -4283,11 +4319,12 @@ búsqueda bidireccional        21     1477         10
 </code></pre>
 </div>
 </div>
-<p>Ahí sí. Veintiún movimientos en vez de cuatro, y la tabla se da vuelta:</p>
+<p>Veintiún movimientos en vez de cuatro, y la tabla se da vuelta:</p>
 <ul>
-<li><strong>Búsqueda bidireccional</strong> pasa a ser la única razonable: 1.477 nodos contra 47.514. Dos árboles de profundidad 10 en vez de uno de profundidad 21. En Rumania ganaba por 11 a 13 y parecía una curiosidad.</li>
-<li><strong>Profundidad iterativa</strong> tampoco termina. Su ventaja es la memoria, y la paga en tiempo; cuando el árbol es así de grande, ese precio se vuelve impagable.</li>
-<li><strong>Costo uniforme</strong> sigue expandiendo más que búsqueda en amplitud, por lo mismo de siempre: la prueba de objetivo tardía.</li>
+<li><strong>búsqueda bidireccional</strong> pasa a ser la única razonable: <strong>1.477</strong> nodos contra 47.514. Dos árboles de profundidad 10 en vez de uno de profundidad 21, que es la diferencia entre O(b^(d/2)) y O(b^d). En Rumania ganaba por 11 a 13 y parecía una curiosidad;</li>
+<li><strong>profundidad iterativa</strong> tampoco termina: llegó al tope de 200.000 expansiones. Su ventaja es la memoria y la paga en tiempo, y con un árbol así de grande ese precio se vuelve impagable;</li>
+<li><strong>costo uniforme</strong> sigue expandiendo más que búsqueda en amplitud —64.732 contra 47.514— por lo mismo de siempre: la prueba de objetivo tardía;</li>
+<li><strong>búsqueda en profundidad</strong> se quedó sin pila a 973 niveles de hondo, buscando un tablero que está a 21.</li>
 </ul>
 <p>La tercera cosa que el mapa de Rumania escondía era el tamaño. Con 20 ciudades todos los algoritmos terminan y las diferencias son de un nodo o dos. El 8-puzzle tiene 181.440 estados —que sigue siendo un problema de juguete— y ya alcanza para que dos de los cinco se queden sin dar respuesta.</p>
 <hr>
@@ -4322,8 +4359,8 @@ búsqueda bidireccional        21     1477         10
 </table>
 <p>Y las tres consecuencias:</p>
 <ol type="1">
-<li><strong>El grafo no hace falta.</strong> Un algoritmo de búsqueda nunca pide el grafo entero; pide los vecinos de un estado por vez. Por eso sirve en espacios que no entrarían en memoria.</li>
-<li><strong>Búsqueda en profundidad no es un algoritmo completo.</strong> Sin límite y sin <code>reached</code>, depende de que el espacio sea chico. Profundidad limitada y profundidad iterativa no son variantes: son lo que la hace usable.</li>
+<li><strong>El grafo no hace falta.</strong> Un algoritmo de búsqueda nunca pide el grafo entero, pide los vecinos de un estado por vez. Por eso sirve en espacios que no entrarían en memoria.</li>
+<li><strong>La búsqueda en profundidad no es un algoritmo completo.</strong> Sin límite y sin <code>reached</code>, depende de que el espacio sea chico. Profundidad limitada y profundidad iterativa no son variantes: son lo que la hace usable.</li>
 <li><strong>Con costos uniformes, amplitud y costo uniforme dan lo mismo.</strong> Toda la diferencia entre las dos está en cuándo se prueba el objetivo.</li>
 </ol>
 <p>Y la que no cambia: los cinco algoritmos son los mismos archivos, sin una línea de diferencia. Lo único que se escribió para esta clase fueron <code>ACTIONS</code>, <code>RESULT</code> y dos tableros.</p>
