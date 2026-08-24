@@ -163,7 +163,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#parte-1" id="toc-parte-1" class="nav-link active" data-scroll-target="#parte-1">Parte 1</a>
   <ul class="collapse">
   <li><a href="#el-problema" id="toc-el-problema" class="nav-link" data-scroll-target="#el-problema">3.2.1 — El problema</a></li>
-  <li><a href="#los-tableros-de-esta-clase" id="toc-los-tableros-de-esta-clase" class="nav-link" data-scroll-target="#los-tableros-de-esta-clase">Los tableros de esta clase</a></li>
+  <li><a href="#los-dos-tableros" id="toc-los-dos-tableros" class="nav-link" data-scroll-target="#los-dos-tableros">Los dos tableros</a></li>
   <li><a href="#la-interfaz-sobre-el-tablero-chico" id="toc-la-interfaz-sobre-el-tablero-chico" class="nav-link" data-scroll-target="#la-interfaz-sobre-el-tablero-chico">La interfaz, sobre el tablero chico</a></li>
   </ul></li>
   <li><a href="#parte-2" id="toc-parte-2" class="nav-link" data-scroll-target="#parte-2">Parte 2</a>
@@ -176,7 +176,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#búsqueda-bidireccional" id="toc-búsqueda-bidireccional" class="nav-link" data-scroll-target="#búsqueda-bidireccional">2.6 — Búsqueda bidireccional</a></li>
   </ul></li>
   <li><a href="#parte-3" id="toc-parte-3" class="nav-link" data-scroll-target="#parte-3">Parte 3</a></li>
-  <li><a href="#lo-que-el-mapa-escondía" id="toc-lo-que-el-mapa-escondía" class="nav-link" data-scroll-target="#lo-que-el-mapa-escondía">Lo que el mapa escondía</a></li>
+  <li><a href="#rumania-y-el-8-puzzle" id="toc-rumania-y-el-8-puzzle" class="nav-link" data-scroll-target="#rumania-y-el-8-puzzle">Rumania y el 8-puzzle</a></li>
   </ul>
 </nav>
     </div>
@@ -203,8 +203,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>Russell &amp; Norvig, <em>Artificial Intelligence: A Modern Approach</em>, 4ª edición, capítulo 3, sección 3.2.1 y figura 3.4.</p>
-<p>Los mismos cinco algoritmos de la clase anterior, aplicados a otro problema. <strong>No hay que tocar ni una línea de los algoritmos</strong>: entran por la misma interfaz de <code>Problem</code> que el mapa de Rumania, y lo único que se escribe de nuevo son las tres funciones que definen el problema.</p>
-<p>El mapa de Rumania es un caso cómodo, y esa comodidad tapaba tres cosas. Vamos a verlas aparecer.</p>
 <hr>
 <section id="parte-1" class="level2">
 <h2 class="anchored" data-anchor-id="parte-1">Parte 1</h2>
@@ -212,7 +210,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="el-problema" class="level3">
 <h3 class="anchored" data-anchor-id="el-problema">3.2.1 — El problema</h3>
 <p>Un tablero de 3×3 con ocho fichas numeradas y un hueco. Se corre una ficha por vez al hueco, hasta dejar el tablero ordenado.</p>
-<p>Los elementos a definir son los mismos de la clase anterior:</p>
+<p>Los elementos a definir:</p>
 <ul>
 <li><strong>INITIAL</strong>: el tablero desordenado</li>
 <li><strong>GOAL</strong>: el tablero ordenado</li>
@@ -226,7 +224,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  7, 6, 0)        7 6 _</code></pre>
 <p>Tupla y no lista porque tiene que poder entrar en un conjunto y en un diccionario: los algoritmos guardan estados en <code>reached</code>, y para eso el estado tiene que ser hashable.</p>
 <div id="97988f3e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.348051Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.347815Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.358258Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.356802Z&quot;}}" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Problem es el mismo de siempre: la interfaz que ya usa Rumania.</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># La interfaz abstracta del capitulo 3: INITIAL, GOAL, ACTIONS, RESULT.</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> problem <span class="im">import</span> Problem</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># El hueco es el 0. Las posiciones van de 0 a 8, por filas.</span></span>
@@ -274,11 +272,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>arriba -3      abajo +3      izquierda -1      derecha +1</code></pre>
 <p><code>ACTIONS</code> devuelve solo las que no se caen del tablero: con el hueco en un borde son tres, en una esquina dos. Ojo con el nombre al mirar el tablero: mover el hueco <code>arriba</code> se ve como una ficha que baja.</p>
 </section>
-<section id="los-tableros-de-esta-clase" class="level3">
-<h3 class="anchored" data-anchor-id="los-tableros-de-esta-clase">Los tableros de esta clase</h3>
-<p>Vamos a usar dos, y cada uno sirve para una cosa distinta:</p>
+<section id="los-dos-tableros" class="level3">
+<h3 class="anchored" data-anchor-id="los-dos-tableros">Los dos tableros</h3>
 <ul>
-<li><strong>CHICO</strong>: a cuatro movimientos del objetivo. Es el que se puede mirar paso a paso, porque los árboles de búsqueda entran en la pantalla.</li>
+<li><strong>CHICO</strong>: a cuatro movimientos del objetivo. Los árboles de búsqueda entran en la pantalla, así que se puede mirar paso a paso.</li>
 <li><strong>FIGURA_34</strong>: el de la figura 3.4 del libro, a veintiún movimientos. Ahí no hay nada para mirar, pero es donde los números se separan.</li>
 </ul>
 <div id="3e298f4e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.362153Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.361704Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.366897Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.365463Z&quot;}}" data-execution_count="2">
@@ -305,7 +302,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="la-interfaz-sobre-el-tablero-chico" class="level3">
 <h3 class="anchored" data-anchor-id="la-interfaz-sobre-el-tablero-chico">La interfaz, sobre el tablero chico</h3>
-<p>Probamos las tres funciones sobre <code>CHICO</code>, igual que hicimos con el mapa de Rumania.</p>
 <p>El hueco arranca abajo a la derecha, que es justo su lugar en el objetivo. Para resolver el tablero <strong>tiene que salir de ahí y volver</strong>: no se puede ir derecho, y por eso la solución son cuatro movimientos y no dos.</p>
 <div id="b7d9a280" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.378552Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.378204Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.382500Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.381696Z&quot;}}" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>problem <span class="op">=</span> EightPuzzle(CHICO)</span>
@@ -337,13 +333,12 @@ IS_GOAL(INITIAL)  False</code></pre>
 </div>
 <p>Tener en cuenta lo que <strong>no</strong> hay: ningún diccionario de vecinos. En Rumania las 23 rutas están escritas una por una y <code>ACTIONS</code> las lee del mapa. Acá el grafo no existe en ningún lado: <code>ACTIONS</code> calcula los vecinos en el momento, cada vez que se lo llama, con una cuenta sobre la tupla.</p>
 <p>Los tableros posibles son las 9! = 362.880 permutaciones de nueve casillas, y desde uno dado se llega a la mitad: <strong>181.440 estados</strong>. Ninguno de ellos está escrito en ninguna parte, y nunca están todos juntos en memoria.</p>
-<p>Esa es la primera cosa que el mapa escondía.</p>
 <hr>
 </section>
 </section>
 <section id="parte-2" class="level2 page-columns page-full">
 <h2 class="anchored" data-anchor-id="parte-2">Parte 2</h2>
-<p>Los mismos cinco algoritmos</p>
+<p>Algoritmos de búsqueda no informada</p>
 <div id="1c2fe4b2" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T20:59:38.385384Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T20:59:38.384993Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T20:59:38.393680Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T20:59:38.392496Z&quot;}}" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> html <span class="im">import</span> escape</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -358,13 +353,11 @@ IS_GOAL(INITIAL)  False</code></pre>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f'style="width:100%; height:</span><span class="sc">{</span>alto<span class="sc">}</span><span class="ss">px; border:1px solid #dee2e6; '</span></span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f'border-radius:.25rem" title="la busqueda paso a paso"&gt;&lt;/iframe&gt;&lt;/div&gt;'</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><code>WebPuzzle</code> hereda de <code>Web</code>, el mismo grabador que usa Rumania. Le cambia dos cosas: no manda el mapa —acá no hay ciudades con coordenadas— y usa una plantilla que dibuja tableros de 3×3 donde la otra dibujaba nombres de ciudades. Todo lo demás se recicla, incluido decidir si un hijo es nuevo, una mejora o un descarte.</p>
 <p>Cada página se recorre paso a paso y tiene dos vistas, con el switch de arriba a la derecha:</p>
 <ul>
 <li><strong>tablero</strong>: el estado de ahora y los estados a los que puede ir. Es el equivalente del mapa de Rumania, lo que se ve sin saber nada de la historia de la búsqueda. La ficha resaltada es la que se movió, así que la acción se lee sola.</li>
 <li><strong>árbol</strong>: todo lo que la búsqueda construyó hasta ese paso. Ahí se ve la diferencia entre un algoritmo y otro, que en el tablero no se ve.</li>
 </ul>
-<p>Las páginas arrancan en <strong>tablero</strong>; el árbol conviene prenderlo para comparar un algoritmo con otro.</p>
 <section id="búsqueda-en-amplitud" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="búsqueda-en-amplitud">2.1 — Búsqueda en amplitud</h3>
 <p>La frontera es una cola <strong>FIFO</strong>: se toman primero los nodos más antiguos, así que el árbol se recorre por niveles. Se evalúa si se llegó al objetivo <strong>al generar</strong> los hijos, y se corta ahí.</p>
@@ -1910,7 +1903,7 @@ mostrar(0);
 </div>
 </div>
 <p>La razón es la prueba de objetivo. Búsqueda en amplitud la hace <strong>al generar</strong> el hijo y corta ahí; costo uniforme la hace <strong>al sacarlo</strong> de la cola, así que antes de llegar a mirarlo termina de expandir todo lo que costaba menos.</p>
-<p>En Rumania esta comparación no se podía hacer, porque ahí las dos búsquedas daban caminos distintos —450 km contra 418— y la conversación se iba a cuál era mejor. Acá dan el mismo, y lo único que queda para comparar es el trabajo.</p>
+<p>En Rumania las dos daban caminos distintos —450 km contra 418— y la diferencia quedaba tapada por esa discusión. Acá dan el mismo camino, y lo único que queda para comparar es el trabajo.</p>
 </section>
 <section id="búsqueda-en-profundidad" class="level3">
 <h3 class="anchored" data-anchor-id="búsqueda-en-profundidad">2.3 — Búsqueda en profundidad</h3>
@@ -1936,7 +1929,7 @@ y el tablero se resuelve en 4</code></pre>
 </div>
 <p>Después de mil expansiones el nodo más hondo estaba a <strong>633 movimientos</strong> del inicio, y el tablero se resuelve en 4.</p>
 <p>La pila LIFO baja por una rama y no sube nunca. <code>IS_CYCLE</code> mira solo los 30 ancestros más cercanos, y con 181.440 estados eso no alcanza: para que se dispare, la búsqueda tiene que volver a uno de los últimos 30 tableros, y siempre tiene otro para donde seguir.</p>
-<p>En Rumania esto no pasaba. Con 20 ciudades, bajar 30 niveles obliga a repetir alguna, <code>IS_CYCLE</code> corta y la búsqueda vuelve a subir. Esa es la segunda cosa que el mapa escondía: <strong>la búsqueda en profundidad depende de que el espacio sea chico</strong>, y eso no está escrito en ninguna parte del algoritmo.</p>
+<p>En Rumania esto no pasaba. Con 20 ciudades, bajar 30 niveles obliga a repetir alguna, <code>IS_CYCLE</code> corta y la búsqueda vuelve a subir. <strong>La búsqueda en profundidad depende de que el espacio sea chico</strong>, y eso no está escrito en ninguna parte del algoritmo.</p>
 <p>Por eso el libro no la presenta sola, sino como el caso <code>l = ∞</code> de la que sigue.</p>
 </section>
 <section id="profundidad-limitada" class="level3 page-columns page-full">
@@ -2710,7 +2703,7 @@ mostrar(0);
 </div>
 </div>
 <p>Encontró la solución de <strong>4 movimientos</strong>, expandiendo 51 nodos: cuatro veces más que búsqueda en amplitud, para el mismo camino.</p>
-<p>Conviene recorrer esta página hasta el fondo. Se ve bajar hasta el límite, frenar —el aviso rojo <code>pasa el limite l = 5: no se expande</code>— y volver a subir a probar otra rama. El árbol crece para abajo y a lo ancho al mismo tiempo, que es la diferencia con los niveles prolijos de la búsqueda en amplitud.</p>
+<p>Baja hasta el límite, frena —el aviso rojo <code>pasa el limite l = 5: no se expande</code>— y vuelve a subir a probar otra rama. El árbol crece para abajo y a lo ancho al mismo tiempo, que es la diferencia con los niveles prolijos de la búsqueda en amplitud.</p>
 </section>
 <section id="profundidad-iterativa" class="level3 page-columns page-full">
 <h3 class="anchored" data-anchor-id="profundidad-iterativa">2.5 — Profundidad iterativa</h3>
@@ -4254,8 +4247,8 @@ mostrar(0);
 </div>
 </div>
 <p>Encontró la solución de <strong>4 movimientos</strong> expandiendo 10 nodos: menos que cualquiera de los otros cuatro.</p>
-<p>Conviene decir en voz alta algo que este problema regala: <strong>el 8-puzzle se puede dar vuelta.</strong> Toda acción se deshace con otra acción, así que el problema inverso es el mismo problema con <code>INITIAL</code> y <code>GOAL</code> cambiados de lugar, y esa es la línea entera que hubo que escribir para tenerlo.</p>
-<p>Cuando una acción no se puede deshacer, el problema inverso hay que construirlo a mano, y a veces directamente no se puede. Esa es la limitación real de la búsqueda bidireccional, y no se ve en ninguno de los dos ejemplos que usamos en estas dos clases.</p>
+<p>Hay una condición que el 8-puzzle cumple y que la búsqueda bidireccional necesita: <strong>se puede dar vuelta.</strong> Toda acción se deshace con otra acción, así que el problema inverso es el mismo problema con <code>INITIAL</code> y <code>GOAL</code> cambiados de lugar.</p>
+<p>Cuando una acción no se puede deshacer, el problema inverso hay que construirlo a mano, y a veces directamente no se puede. Esa es la limitación real de la búsqueda bidireccional, y no aparece ni en el mapa de Rumania ni acá.</p>
 <hr>
 </section>
 </section>
@@ -4326,11 +4319,11 @@ búsqueda bidireccional        21     1477         10
 <li><strong>costo uniforme</strong> sigue expandiendo más que búsqueda en amplitud —64.732 contra 47.514— por lo mismo de siempre: la prueba de objetivo tardía;</li>
 <li><strong>búsqueda en profundidad</strong> se quedó sin pila a 973 niveles de hondo, buscando un tablero que está a 21.</li>
 </ul>
-<p>La tercera cosa que el mapa de Rumania escondía era el tamaño. Con 20 ciudades todos los algoritmos terminan y las diferencias son de un nodo o dos. El 8-puzzle tiene 181.440 estados —que sigue siendo un problema de juguete— y ya alcanza para que dos de los cinco se queden sin dar respuesta.</p>
+<p>Con 20 ciudades todos los algoritmos terminan y las diferencias son de un nodo o dos. El 8-puzzle tiene 181.440 estados —que sigue siendo un problema de juguete— y ya alcanza para que dos de los cinco se queden sin dar respuesta.</p>
 <hr>
 </section>
-<section id="lo-que-el-mapa-escondía" class="level2">
-<h2 class="anchored" data-anchor-id="lo-que-el-mapa-escondía">Lo que el mapa escondía</h2>
+<section id="rumania-y-el-8-puzzle" class="level2">
+<h2 class="anchored" data-anchor-id="rumania-y-el-8-puzzle">Rumania y el 8-puzzle</h2>
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -4357,13 +4350,12 @@ búsqueda bidireccional        21     1477         10
 </tr>
 </tbody>
 </table>
-<p>Y las tres consecuencias:</p>
+<p>Consecuencias:</p>
 <ol type="1">
 <li><strong>El grafo no hace falta.</strong> Un algoritmo de búsqueda nunca pide el grafo entero, pide los vecinos de un estado por vez. Por eso sirve en espacios que no entrarían en memoria.</li>
 <li><strong>La búsqueda en profundidad no es un algoritmo completo.</strong> Sin límite y sin <code>reached</code>, depende de que el espacio sea chico. Profundidad limitada y profundidad iterativa no son variantes: son lo que la hace usable.</li>
 <li><strong>Con costos uniformes, amplitud y costo uniforme dan lo mismo.</strong> Toda la diferencia entre las dos está en cuándo se prueba el objetivo.</li>
 </ol>
-<p>Y la que no cambia: los cinco algoritmos son los mismos archivos, sin una línea de diferencia. Lo único que se escribió para esta clase fueron <code>ACTIONS</code>, <code>RESULT</code> y dos tableros.</p>
 
 
 </section>
