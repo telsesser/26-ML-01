@@ -2082,15 +2082,21 @@ mostrar(0);
 <div id="1685f88e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.850401Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.849913Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.855213Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.854548Z&quot;}}" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># El bucle de depth-first sin la guarda de IS_CYCLE, cortado a mano en</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># nueve vueltas: sin ese corte esta celda no termina.</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>frontier <span class="op">=</span> LIFOQueue([Node(STATE<span class="op">=</span>problem.INITIAL)])</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> vuelta <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">9</span>):</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    node <span class="op">=</span> frontier.POP()</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">" -&gt; "</span>.join(path_states(node)))</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> child <span class="kw">in</span> expand(problem, node):</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>        frontier.ADD(child)</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">y la pila todavía tiene </span><span class="sc">{</span><span class="bu">len</span>(frontier)<span class="sc">}</span><span class="ss"> nodos esperando."</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>ciclo <span class="op">=</span> Web(problem, <span class="st">"DEPTH-FIRST-SEARCH"</span>, <span class="st">"pila LIFO, sin IS_CYCLE"</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>            key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>frontier <span class="op">=</span> LIFOQueue([Node(STATE<span class="op">=</span>problem.INITIAL)])</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> vuelta <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">9</span>):</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    node <span class="op">=</span> frontier.POP()</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    ciclo.POP(node, frontier, <span class="va">None</span>)</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">" -&gt; "</span>.join(path_states(node)))</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> child <span class="kw">in</span> expand(problem, node):</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>        ciclo.CHILD(child, <span class="va">None</span>)</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>        frontier.ADD(child)</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    ciclo.STEP(frontier, <span class="va">None</span>)</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">y la pila todavía tiene </span><span class="sc">{</span><span class="bu">len</span>(frontier)<span class="sc">}</span><span class="ss"> nodos esperando."</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Arad
 Arad -&gt; Zerind
@@ -2107,43 +2113,731 @@ y la pila todavía tiene 11 nodos esperando.</code></pre>
 </div>
 <p><strong>Zerind y Oradea, para siempre.</strong> Son vecinos entre sí, y la LIFO devuelve siempre el último hijo generado: el último vecino de Zerind es Oradea y el último vecino de Oradea es Zerind. Cada vuelta saca un nodo y mete dos, así que la pila crece de a uno y nunca se vacía. Bucharest está del otro lado del mapa y la búsqueda no va a mirar para allá nunca.</p>
 <p>En amplitud y en costo uniforme esto no puede pasar: <code>reached</code> se acuerda de por dónde ya pasó. Acá no hay <code>reached</code>, así que la única memoria que tiene un nodo es su propio camino hasta la raíz.</p>
+<p>Abajo están las nueve vueltas paso a paso. No hay panel de resultado al final porque no hay resultado: el corte en la vuelta nueve lo pusimos nosotros, no el algoritmo.</p>
+<div id="c-ciclo-ver" class="cell page-columns page-full" data-execution_count="20">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>ver(ciclo)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display column-screen-inset" data-execution_count="20">
+<div><iframe srcdoc="<title>Arad a Bucharest</title>
+<link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+<link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&amp;display=swap&quot;>
+
+<style>
+/* ---------------------------------------------------------------------
+   La paleta y las dos familias de letra son las de Quarto: cada valor de
+   aca esta copiado del CSS que el sitio ya carga -- bootstrap cosmo y el
+   resaltado de sintaxis. La idea es que el panel se lea como una celda
+   de codigo mas de la pagina, y que un color signifique adentro del
+   panel lo mismo que significa en el codigo de arriba.
+
+   Un solo tema, y claro. El sitio es `theme: cosmo`, que no tiene modo
+   oscuro. Si el panel siguiera al sistema operativo, en una maquina
+   puesta en oscuro quedaria una placa negra en el medio de una pagina
+   blanca, que es justo lo que se quiere evitar.
+   --------------------------------------------------------------------- */
+
+:root {
+  --sans: &quot;Source Sans Pro&quot;, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;,
+          Roboto, &quot;Helvetica Neue&quot;, Arial, sans-serif;
+  --mono: SFMono-Regular, Menlo, Monaco, Consolas, &quot;Liberation Mono&quot;,
+          &quot;Courier New&quot;, monospace;
+
+  --papel:  #FFFFFF;   /* --bs-body-bg */
+  --carta:  #FFFFFF;
+  --pauta:  #F1F3F5;   /* el gris de div.sourceCode, aplanado sobre blanco */
+  --prosa:  #343A40;   /* --bs-body-color */
+  --tinta:  #003B4F;   /* el color del codigo: los estados y los numeros */
+  --tinta2: #5E5E5E;   /* el de los comentarios */
+  --linea:  #DEE2E6;   /* --bs-border-color */
+  --muerto: #999CA0;   /* --bs-secondary-color, aplanado */
+
+  /* Los cinco colores del resaltado, cada uno con el papel que ya tiene: */
+  --acento: #00769E;   /* import    -> el nodo de ahora, lo que es nuevo */
+  --verde:  #20794D;   /* string    -> el objetivo */
+  --ocre:   #8F5902;   /* constante -> la frontera, el proximo en salir */
+  --rojo:   #AD0000;   /* numero    -> lo descartado, el fallo */
+  --otro:   #4758AB;   /* funcion   -> el otro lado, en bidireccional */
+
+  --tenue:   rgba(0, 118, 158, .07);
+  --verdoso: rgba(32, 121, 77, .08);
+  --radio:   4px;      /* --bs-border-radius: .25rem sobre 17px */
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--prosa);
+  font: 400 15px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- barra ---------- */
+
+.barra {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+  padding: 18px 28px 14px;
+  background: var(--pauta);
+  border-bottom: 1px solid var(--linea);
+}
+.barra h1 {
+  margin: 0;
+  font: 700 19px/1.25 var(--sans);
+  letter-spacing: -.005em;
+}
+.barra .sub {
+  margin: 3px 0 0;
+  color: var(--tinta2); font-size: 13.5px;
+}
+.barra .sub b { font-family: var(--mono); font-weight: 400; color: var(--acento); }
+
+.mando { display: flex; align-items: center; gap: 10px; }
+.mando button {
+  font: 600 14px/1 var(--sans);
+  color: var(--tinta); background: var(--carta);
+  border: 1px solid var(--linea); border-radius: var(--radio);
+  padding: 9px 14px; cursor: pointer;
+}
+.mando button:hover:not(:disabled) { border-color: var(--acento); color: var(--acento); }
+.mando button:disabled { opacity: .35; cursor: default; }
+.mando button:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+/* el switch mapa / arbol: dos botones pegados, uno hundido */
+.mando .vista { display: flex; border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; }
+.mando .vista button {
+  font-weight: 400; font-size: 13px;
+  border: 0; border-radius: 0; padding: 9px 13px;
+  color: var(--tinta2); background: var(--carta);
+}
+.mando .vista button[aria-pressed=&quot;true&quot;] {
+  background: var(--tenue); color: var(--acento); font-weight: 600;
+}
+.vuelta {
+  font: 600 11.5px/1 var(--sans);
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--otro); border: 1px solid var(--otro); border-radius: var(--radio);
+  padding: 5px 9px;
+}
+.contador { color: var(--tinta2); font-size: 13px; min-width: 96px; text-align: center; }
+.contador b { color: var(--tinta); font-weight: 600; }
+
+/* ---------- riel de pasos ---------- */
+
+.riel {
+  display: flex; align-items: center; gap: 6px;
+  padding: 12px 28px; overflow-x: auto;
+  border-bottom: 1px solid var(--linea);
+}
+.riel .et {
+  color: var(--muerto); font-size: 11px; letter-spacing: .09em;
+  text-transform: uppercase; margin-right: 6px; white-space: nowrap;
+}
+.riel button {
+  font: 400 13px/1 var(--sans); white-space: nowrap;
+  color: var(--tinta2); background: transparent;
+  border: 1px solid var(--linea); border-radius: var(--radio);
+  padding: 6px 11px; cursor: pointer;
+}
+.riel button:hover { color: var(--acento); border-color: var(--acento); }
+.riel button[aria-current=&quot;true&quot;] {
+  color: var(--papel); background: var(--acento); border-color: var(--acento);
+  font-weight: 600;
+}
+.riel button:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+/* ---------- cuerpo ---------- */
+
+main {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr);
+  gap: 22px; padding: 22px 28px 40px; align-items: start;
+}
+@media (max-width: 900px) { main { grid-template-columns: minmax(0, 1fr); } }
+
+.tarjeta {
+  background: var(--carta); border: 1px solid var(--linea);
+  border-radius: var(--radio);
+}
+.mapa { padding: 8px; }
+.mapa svg { display: block; width: 100%; height: auto; }
+.mapa svg.oculto { display: none; }
+/* El arbol se dibuja a tamano real para que los nombres se lean, y la
+   caja lo deja correr: un arbol de profundidad no entra en la pantalla,
+   y eso tambien es parte de lo que hay que ver. */
+.caja-arbol { display: flex; overflow: auto; max-height: min(64vh, 580px); }
+.caja-arbol.oculto { display: none; }
+#arbol { width: auto; height: auto; margin: auto; flex: none; }
+
+.panel { display: flex; flex-direction: column; }
+.bloque { padding: 16px 18px; border-bottom: 1px solid var(--linea); }
+.bloque:last-child { border-bottom: 0; }
+.bloque > h2 {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin: 0 0 10px;
+  font: 600 11px/1 var(--sans);
+  letter-spacing: .12em; text-transform: uppercase; color: var(--muerto);
+}
+.bloque > h2 span { letter-spacing: 0; text-transform: none; font-weight: 400; }
+
+/* POP */
+.pop-ciudad {
+  font: 700 21px/1.15 var(--sans); color: var(--acento);
+}
+.pop-datos { margin-top: 6px; display: flex; gap: 16px; font-size: 13.5px; color: var(--tinta2); }
+.pop-datos b { color: var(--tinta); font-weight: 600; }
+.camino { margin-top: 10px; font-size: 13px; color: var(--tinta2); word-break: break-word; }
+
+/* EXPAND */
+.hijo {
+  display: grid; grid-template-columns: 14px 1fr auto auto; gap: 4px 10px;
+  align-items: baseline; padding: 5px 0 5px 8px;
+  border-left: 2px solid transparent; font-size: 14px;
+}
+.hijo .sig { font-weight: 600; }
+.hijo .nota { grid-column: 2 / -1; font-size: 12.5px; color: var(--muerto); }
+.hijo.nuevo      { border-left-color: var(--acento); }
+.hijo.nuevo .sig { color: var(--acento); }
+.hijo.mejora     { border-left-color: var(--acento); background: var(--tenue); }
+.hijo.mejora .sig, .hijo.mejora .nota, .hijo.mejora .ciudad { color: var(--acento); font-weight: 600; }
+.hijo.descartado { border-left-color: var(--rojo); }
+.hijo.descartado .sig { color: var(--rojo); }
+.hijo.descartado .ciudad, .hijo.descartado .val { color: var(--tinta2); }
+.hijo .val { font-size: 13px; color: var(--tinta2); }
+
+/* FRONTIER */
+.cola { display: flex; flex-direction: column; }
+.fila {
+  display: grid; grid-template-columns: 12px 1fr auto; gap: 10px;
+  align-items: baseline; padding: 4px 0; font-size: 14px;
+  border-bottom: 1px dotted var(--linea);
+}
+.fila:last-child { border-bottom: 0; }
+.fila .pico { color: var(--ocre); font-weight: 600; }
+.fila.top .ciudad { font-weight: 600; color: var(--ocre); }
+.fila.top .val { color: var(--ocre); font-weight: 600; }
+.fila .val { font-size: 13px; }
+.fila.stale .ciudad, .fila.stale .val { color: var(--muerto); text-decoration: line-through; }
+.tag {
+  font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--rojo); border: 1px solid var(--rojo); border-radius: 3px;
+  padding: 0 4px; margin-left: 6px; text-decoration: none; display: inline-block;
+  vertical-align: 1px;
+}
+
+/* REACHED */
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+  font-size: 12.5px; color: var(--tinta2);
+  border: 1px solid var(--linea); border-radius: var(--radio); padding: 2px 7px;
+}
+.chip b { color: var(--tinta); font-weight: 600; }
+.chip.otro { color: var(--otro); border-color: var(--otro); }
+
+/* DONE */
+.done { padding: 16px 18px; border-top: 1px solid var(--linea); }
+.done.goal { background: var(--verdoso); }
+.done h3 {
+  margin: 0 0 6px;
+  font: 600 12px/1 var(--sans);
+  letter-spacing: .12em; text-transform: uppercase; color: var(--verde);
+}
+.done.fail h3 { color: var(--rojo); }
+.done p { margin: 0; font-size: 14px; }
+.done .ruta { font-family: var(--mono); font-size: 13px; color: var(--tinta); }
+.done .costo { margin-top: 6px; color: var(--tinta2); font-size: 13.5px; }
+.nota-paso {
+  margin: 4px 0 0; padding-left: 10px; font-size: 13.5px; color: var(--rojo);
+  border-left: 2px solid var(--rojo);
+}
+/* Como el .d-none de bootstrap: gana siempre. Hay reglas mas abajo que
+   ponen display:flex y sin el !important le ganaban a esta por orden:
+   al pasar al arbol quedaban las dos vistas juntas. */
+.oculto { display: none !important; }
+
+/* ---------- mapa ---------- */
+
+.e { stroke: var(--linea); stroke-width: 1.6; }
+.e.path { stroke: var(--acento); stroke-width: 3.2; }
+.e.sol  { stroke: var(--verde); stroke-width: 4.4; }
+.km {
+  font-family: var(--mono); font-size: 9px; fill: var(--muerto);
+  text-anchor: middle; paint-order: stroke; stroke: var(--carta); stroke-width: 3.5;
+}
+.n circle { fill: var(--carta); stroke: var(--linea); stroke-width: 1.8; transition: none; }
+.n text {
+  font: 600 11.5px var(--sans); fill: var(--muerto);
+  text-anchor: middle; paint-order: stroke; stroke: var(--carta); stroke-width: 3.5;
+}
+.n.reached circle { fill: var(--acento); stroke: var(--acento); fill-opacity: .3; }
+.n.reached text   { fill: var(--tinta2); }
+.n.frontier circle { fill: var(--carta); stroke: var(--ocre); stroke-width: 2.6; }
+.n.frontier text   { fill: var(--ocre); }
+.n.pop circle { fill: var(--acento); stroke: var(--acento); fill-opacity: 1; }
+.n.pop text   { fill: var(--acento); font-size: 13px; }
+.n .halo { fill: none; stroke: var(--acento); stroke-width: 1.4; opacity: 0; }
+.n.pop .halo { opacity: .45; }
+.n.goal circle { stroke: var(--verde); stroke-dasharray: 3 2.5; }
+/* El otro lado de la busqueda bidireccional: un anillo, sobre lo que ya haya. */
+.n.otro circle:not(.halo) { stroke: var(--otro); stroke-width: 2.8; }
+.n.otro:not(.reached):not(.frontier):not(.pop) text { fill: var(--otro); }
+
+/* ---------- arbol de busqueda ---------- */
+
+.rama { stroke: var(--linea); stroke-width: 1.6; }
+.rama.sol { stroke: var(--verde); stroke-width: 3.2; }
+/* Un hijo que se genero y no llego a entrar a la frontera. */
+.n.descartado circle { fill: var(--carta); stroke: var(--muerto); stroke-dasharray: 2.5 2.5; }
+.n.descartado text { fill: var(--muerto); }
+.n text.g { font: 400 9.5px var(--mono); fill: var(--muerto); }
+</style>
+
+<header class=&quot;barra&quot;>
+  <div>
+    <h1 id=&quot;nombre&quot;></h1>
+    <p class=&quot;sub&quot;><b id=&quot;label&quot;></b> &amp;middot; <span id=&quot;ruta-titulo&quot;></span></p>
+  </div>
+  <div class=&quot;mando&quot;>
+    <span class=&quot;vista&quot;>
+      <button id=&quot;v-mapa&quot; aria-pressed=&quot;true&quot;>mapa</button>
+      <button id=&quot;v-arbol&quot; aria-pressed=&quot;false&quot;>&amp;aacute;rbol</button>
+    </span>
+    <span class=&quot;vuelta oculto&quot; id=&quot;vuelta&quot;></span>
+    <button id=&quot;prev&quot; aria-label=&quot;paso anterior&quot;>&amp;larr;</button>
+    <span class=&quot;contador&quot;>paso <b id=&quot;i&quot;>1</b> / <span id=&quot;n&quot;>1</span></span>
+    <button id=&quot;next&quot; aria-label=&quot;paso siguiente&quot;>&amp;rarr;</button>
+  </div>
+</header>
+
+<nav class=&quot;riel&quot; id=&quot;riel&quot;><span class=&quot;et&quot;>expandidos</span></nav>
+
+<main>
+  <section class=&quot;tarjeta mapa&quot;>
+    <svg id=&quot;svg&quot; role=&quot;img&quot; aria-label=&quot;mapa de Rumania&quot;></svg>
+    <div class=&quot;caja-arbol oculto&quot; id=&quot;caja-arbol&quot;>
+      <svg id=&quot;arbol&quot; role=&quot;img&quot; aria-label=&quot;arbol de busqueda&quot;></svg>
+    </div>
+  </section>
+
+  <section class=&quot;tarjeta panel&quot;>
+    <div class=&quot;bloque&quot;>
+      <h2>POP</h2>
+      <div class=&quot;pop-ciudad&quot; id=&quot;pop-ciudad&quot;></div>
+      <div class=&quot;pop-datos num&quot; id=&quot;pop-datos&quot;></div>
+      <div class=&quot;camino&quot; id=&quot;pop-camino&quot;></div>
+    </div>
+
+    <div class=&quot;bloque&quot; id=&quot;caja-expand&quot;>
+      <h2>EXPAND <span id=&quot;expand-n&quot;></span></h2>
+      <div id=&quot;expand&quot;></div>
+      <p class=&quot;nota-paso oculto&quot; id=&quot;nota&quot;></p>
+    </div>
+
+    <div class=&quot;bloque&quot;>
+      <h2>FRONTIER <span id=&quot;frontier-n&quot;></span></h2>
+      <div class=&quot;cola&quot; id=&quot;frontier&quot;></div>
+    </div>
+
+    <div class=&quot;bloque&quot; id=&quot;caja-reached&quot;>
+      <h2>REACHED <span id=&quot;reached-n&quot;></span></h2>
+      <div class=&quot;chips&quot; id=&quot;reached&quot;></div>
+    </div>
+
+    <div class=&quot;bloque oculto&quot; id=&quot;caja-otros&quot;>
+      <h2>REACHED del otro lado <span id=&quot;otros-n&quot;></span></h2>
+      <div class=&quot;chips&quot; id=&quot;otros&quot;></div>
+    </div>
+
+    <div class=&quot;done oculto&quot; id=&quot;done&quot;></div>
+  </section>
+</main>
+
+<script>
+const DATA = {&quot;name&quot;: &quot;DEPTH-FIRST-SEARCH&quot;, &quot;label&quot;: &quot;pila LIFO, sin IS_CYCLE&quot;, &quot;keyName&quot;: &quot;prof&quot;, &quot;initial&quot;: &quot;Arad&quot;, &quot;goal&quot;: &quot;Bucharest&quot;, &quot;cities&quot;: {&quot;Arad&quot;: [91, 349], &quot;Bucharest&quot;: [400, 514], &quot;Craiova&quot;: [253, 553], &quot;Drobeta&quot;: [165, 542], &quot;Eforie&quot;: [562, 548], &quot;Fagaras&quot;: [305, 392], &quot;Giurgiu&quot;: [375, 571], &quot;Hirsova&quot;: [534, 491], &quot;Iasi&quot;: [473, 335], &quot;Lugoj&quot;: [165, 462], &quot;Mehadia&quot;: [168, 502], &quot;Neamt&quot;: [406, 304], &quot;Oradea&quot;: [131, 270], &quot;Pitesti&quot;: [320, 473], &quot;Rimnicu&quot;: [233, 431], &quot;Sibiu&quot;: [207, 384], &quot;Timisoara&quot;: [94, 431], &quot;Urziceni&quot;: [456, 491], &quot;Vaslui&quot;: [509, 397], &quot;Zerind&quot;: [108, 310]}, &quot;links&quot;: [[&quot;Arad&quot;, &quot;Sibiu&quot;, 140], [&quot;Arad&quot;, &quot;Timisoara&quot;, 118], [&quot;Arad&quot;, &quot;Zerind&quot;, 75], [&quot;Bucharest&quot;, &quot;Fagaras&quot;, 211], [&quot;Bucharest&quot;, &quot;Giurgiu&quot;, 90], [&quot;Bucharest&quot;, &quot;Pitesti&quot;, 101], [&quot;Bucharest&quot;, &quot;Urziceni&quot;, 85], [&quot;Craiova&quot;, &quot;Drobeta&quot;, 120], [&quot;Craiova&quot;, &quot;Pitesti&quot;, 138], [&quot;Craiova&quot;, &quot;Rimnicu&quot;, 146], [&quot;Drobeta&quot;, &quot;Mehadia&quot;, 75], [&quot;Eforie&quot;, &quot;Hirsova&quot;, 86], [&quot;Fagaras&quot;, &quot;Sibiu&quot;, 99], [&quot;Hirsova&quot;, &quot;Urziceni&quot;, 98], [&quot;Iasi&quot;, &quot;Neamt&quot;, 87], [&quot;Iasi&quot;, &quot;Vaslui&quot;, 92], [&quot;Lugoj&quot;, &quot;Mehadia&quot;, 70], [&quot;Lugoj&quot;, &quot;Timisoara&quot;, 111], [&quot;Oradea&quot;, &quot;Sibiu&quot;, 151], [&quot;Oradea&quot;, &quot;Zerind&quot;, 71], [&quot;Pitesti&quot;, &quot;Rimnicu&quot;, 97], [&quot;Rimnicu&quot;, &quot;Sibiu&quot;, 80], [&quot;Urziceni&quot;, &quot;Vaslui&quot;, 142]], &quot;h&quot;: {&quot;Arad&quot;: 366, &quot;Bucharest&quot;: 0, &quot;Craiova&quot;: 160, &quot;Drobeta&quot;: 242, &quot;Eforie&quot;: 161, &quot;Fagaras&quot;: 176, &quot;Giurgiu&quot;: 77, &quot;Hirsova&quot;: 151, &quot;Iasi&quot;: 226, &quot;Lugoj&quot;: 244, &quot;Mehadia&quot;: 241, &quot;Neamt&quot;: 234, &quot;Oradea&quot;: 380, &quot;Pitesti&quot;: 100, &quot;Rimnicu&quot;: 193, &quot;Sibiu&quot;: 253, &quot;Timisoara&quot;: 329, &quot;Urziceni&quot;: 80, &quot;Vaslui&quot;: 199, &quot;Zerind&quot;: 374}, &quot;viewBox&quot;: &quot;45 224 563 393&quot;, &quot;frames&quot;: [{&quot;step&quot;: 1, &quot;round&quot;: null, &quot;otros&quot;: null, &quot;pop&quot;: {&quot;state&quot;: &quot;Arad&quot;, &quot;g&quot;: 0, &quot;key&quot;: 0, &quot;id&quot;: 1, &quot;parent&quot;: null, &quot;depth&quot;: 0, &quot;path&quot;: [&quot;Arad&quot;]}, &quot;children&quot;: [{&quot;state&quot;: &quot;Sibiu&quot;, &quot;g&quot;: 140, &quot;key&quot;: 1, &quot;id&quot;: 0, &quot;parent&quot;: 1, &quot;depth&quot;: 1, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}, {&quot;state&quot;: &quot;Timisoara&quot;, &quot;g&quot;: 118, &quot;key&quot;: 1, &quot;id&quot;: 2, &quot;parent&quot;: 1, &quot;depth&quot;: 1, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}, {&quot;state&quot;: &quot;Zerind&quot;, &quot;g&quot;: 75, &quot;key&quot;: 1, &quot;id&quot;: 3, &quot;parent&quot;: 1, &quot;depth&quot;: 1, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}], &quot;note&quot;: null, &quot;frontier&quot;: [{&quot;state&quot;: &quot;Zerind&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Timisoara&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}], &quot;reached&quot;: null, &quot;done&quot;: null}, {&quot;step&quot;: 2, &quot;round&quot;: null, &quot;otros&quot;: null, &quot;pop&quot;: {&quot;state&quot;: &quot;Zerind&quot;, &quot;g&quot;: 75, &quot;key&quot;: 1, &quot;id&quot;: 3, &quot;parent&quot;: 1, &quot;depth&quot;: 1, &quot;path&quot;: [&quot;Arad&quot;, &quot;Zerind&quot;]}, &quot;children&quot;: [{&quot;state&quot;: &quot;Arad&quot;, &quot;g&quot;: 150, &quot;key&quot;: 2, &quot;id&quot;: 4, &quot;parent&quot;: 3, &quot;depth&quot;: 2, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}, {&quot;state&quot;: &quot;Oradea&quot;, &quot;g&quot;: 146, &quot;key&quot;: 2, &quot;id&quot;: 5, &quot;parent&quot;: 3, &quot;depth&quot;: 2, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}], &quot;note&quot;: null, &quot;frontier&quot;: [{&quot;state&quot;: &quot;Oradea&quot;, &quot;key&quot;: 2, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 2, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Timisoara&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}], &quot;reached&quot;: null, &quot;done&quot;: null}, {&quot;step&quot;: 3, &quot;round&quot;: null, &quot;otros&quot;: null, &quot;pop&quot;: {&quot;state&quot;: &quot;Oradea&quot;, &quot;g&quot;: 146, &quot;key&quot;: 2, &quot;id&quot;: 5, &quot;parent&quot;: 3, &quot;depth&quot;: 2, &quot;path&quot;: [&quot;Arad&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;]}, &quot;children&quot;: [{&quot;state&quot;: &quot;Sibiu&quot;, &quot;g&quot;: 297, &quot;key&quot;: 3, &quot;id&quot;: 6, &quot;parent&quot;: 5, &quot;depth&quot;: 3, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}, {&quot;state&quot;: &quot;Zerind&quot;, &quot;g&quot;: 217, &quot;key&quot;: 3, &quot;id&quot;: 7, &quot;parent&quot;: 5, &quot;depth&quot;: 3, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}], &quot;note&quot;: null, &quot;frontier&quot;: [{&quot;state&quot;: &quot;Zerind&quot;, &quot;key&quot;: 3, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 3, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 2, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Timisoara&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}], &quot;reached&quot;: null, &quot;done&quot;: null}, {&quot;step&quot;: 4, &quot;round&quot;: null, &quot;otros&quot;: null, &quot;pop&quot;: {&quot;state&quot;: &quot;Zerind&quot;, &quot;g&quot;: 217, &quot;key&quot;: 3, &quot;id&quot;: 7, &quot;parent&quot;: 5, &quot;depth&quot;: 3, &quot;path&quot;: [&quot;Arad&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;]}, &quot;children&quot;: [{&quot;state&quot;: &quot;Arad&quot;, &quot;g&quot;: 292, &quot;key&quot;: 4, &quot;id&quot;: 8, &quot;parent&quot;: 7, &quot;depth&quot;: 4, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}, {&quot;state&quot;: &quot;Oradea&quot;, &quot;g&quot;: 288, &quot;key&quot;: 4, &quot;id&quot;: 9, &quot;parent&quot;: 7, &quot;depth&quot;: 4, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}], &quot;note&quot;: null, &quot;frontier&quot;: [{&quot;state&quot;: &quot;Oradea&quot;, &quot;key&quot;: 4, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 4, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 3, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 2, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Timisoara&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}], &quot;reached&quot;: null, &quot;done&quot;: null}, {&quot;step&quot;: 5, &quot;round&quot;: null, &quot;otros&quot;: null, &quot;pop&quot;: {&quot;state&quot;: &quot;Oradea&quot;, &quot;g&quot;: 288, &quot;key&quot;: 4, &quot;id&quot;: 9, &quot;parent&quot;: 7, &quot;depth&quot;: 4, &quot;path&quot;: [&quot;Arad&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;]}, &quot;children&quot;: [{&quot;state&quot;: &quot;Sibiu&quot;, &quot;g&quot;: 439, &quot;key&quot;: 5, &quot;id&quot;: 10, &quot;parent&quot;: 9, &quot;depth&quot;: 5, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}, {&quot;state&quot;: &quot;Zerind&quot;, &quot;g&quot;: 359, &quot;key&quot;: 5, &quot;id&quot;: 11, &quot;parent&quot;: 9, &quot;depth&quot;: 5, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}], &quot;note&quot;: null, &quot;frontier&quot;: [{&quot;state&quot;: &quot;Zerind&quot;, &quot;key&quot;: 5, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 5, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 4, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 3, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 2, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Timisoara&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}], &quot;reached&quot;: null, &quot;done&quot;: null}, {&quot;step&quot;: 6, &quot;round&quot;: null, &quot;otros&quot;: null, &quot;pop&quot;: {&quot;state&quot;: &quot;Zerind&quot;, &quot;g&quot;: 359, &quot;key&quot;: 5, &quot;id&quot;: 11, &quot;parent&quot;: 9, &quot;depth&quot;: 5, &quot;path&quot;: [&quot;Arad&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;]}, &quot;children&quot;: [{&quot;state&quot;: &quot;Arad&quot;, &quot;g&quot;: 434, &quot;key&quot;: 6, &quot;id&quot;: 12, &quot;parent&quot;: 11, &quot;depth&quot;: 6, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}, {&quot;state&quot;: &quot;Oradea&quot;, &quot;g&quot;: 430, &quot;key&quot;: 6, &quot;id&quot;: 13, &quot;parent&quot;: 11, &quot;depth&quot;: 6, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}], &quot;note&quot;: null, &quot;frontier&quot;: [{&quot;state&quot;: &quot;Oradea&quot;, &quot;key&quot;: 6, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 6, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 5, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 4, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 3, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 2, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Timisoara&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}], &quot;reached&quot;: null, &quot;done&quot;: null}, {&quot;step&quot;: 7, &quot;round&quot;: null, &quot;otros&quot;: null, &quot;pop&quot;: {&quot;state&quot;: &quot;Oradea&quot;, &quot;g&quot;: 430, &quot;key&quot;: 6, &quot;id&quot;: 13, &quot;parent&quot;: 11, &quot;depth&quot;: 6, &quot;path&quot;: [&quot;Arad&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;]}, &quot;children&quot;: [{&quot;state&quot;: &quot;Sibiu&quot;, &quot;g&quot;: 581, &quot;key&quot;: 7, &quot;id&quot;: 14, &quot;parent&quot;: 13, &quot;depth&quot;: 7, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}, {&quot;state&quot;: &quot;Zerind&quot;, &quot;g&quot;: 501, &quot;key&quot;: 7, &quot;id&quot;: 15, &quot;parent&quot;: 13, &quot;depth&quot;: 7, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}], &quot;note&quot;: null, &quot;frontier&quot;: [{&quot;state&quot;: &quot;Zerind&quot;, &quot;key&quot;: 7, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 7, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 6, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 5, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 4, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 3, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 2, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Timisoara&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}], &quot;reached&quot;: null, &quot;done&quot;: null}, {&quot;step&quot;: 8, &quot;round&quot;: null, &quot;otros&quot;: null, &quot;pop&quot;: {&quot;state&quot;: &quot;Zerind&quot;, &quot;g&quot;: 501, &quot;key&quot;: 7, &quot;id&quot;: 15, &quot;parent&quot;: 13, &quot;depth&quot;: 7, &quot;path&quot;: [&quot;Arad&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;]}, &quot;children&quot;: [{&quot;state&quot;: &quot;Arad&quot;, &quot;g&quot;: 576, &quot;key&quot;: 8, &quot;id&quot;: 16, &quot;parent&quot;: 15, &quot;depth&quot;: 8, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}, {&quot;state&quot;: &quot;Oradea&quot;, &quot;g&quot;: 572, &quot;key&quot;: 8, &quot;id&quot;: 17, &quot;parent&quot;: 15, &quot;depth&quot;: 8, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}], &quot;note&quot;: null, &quot;frontier&quot;: [{&quot;state&quot;: &quot;Oradea&quot;, &quot;key&quot;: 8, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 8, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 7, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 6, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 5, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 4, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 3, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 2, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Timisoara&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}], &quot;reached&quot;: null, &quot;done&quot;: null}, {&quot;step&quot;: 9, &quot;round&quot;: null, &quot;otros&quot;: null, &quot;pop&quot;: {&quot;state&quot;: &quot;Oradea&quot;, &quot;g&quot;: 572, &quot;key&quot;: 8, &quot;id&quot;: 17, &quot;parent&quot;: 15, &quot;depth&quot;: 8, &quot;path&quot;: [&quot;Arad&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;, &quot;Zerind&quot;, &quot;Oradea&quot;]}, &quot;children&quot;: [{&quot;state&quot;: &quot;Sibiu&quot;, &quot;g&quot;: 723, &quot;key&quot;: 9, &quot;id&quot;: 18, &quot;parent&quot;: 17, &quot;depth&quot;: 9, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}, {&quot;state&quot;: &quot;Zerind&quot;, &quot;g&quot;: 643, &quot;key&quot;: 9, &quot;id&quot;: 19, &quot;parent&quot;: 17, &quot;depth&quot;: 9, &quot;kind&quot;: &quot;nuevo&quot;, &quot;nota&quot;: &quot;&quot;}], &quot;note&quot;: null, &quot;frontier&quot;: [{&quot;state&quot;: &quot;Zerind&quot;, &quot;key&quot;: 9, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 9, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 8, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 7, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 6, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 5, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 4, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 3, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Arad&quot;, &quot;key&quot;: 2, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Timisoara&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}, {&quot;state&quot;: &quot;Sibiu&quot;, &quot;key&quot;: 1, &quot;stale&quot;: false}], &quot;reached&quot;: null, &quot;done&quot;: null}]};
+const SVGNS = &quot;http://www.w3.org/2000/svg&quot;;
+const el = (id) => document.getElementById(id);
+const num = (v) => Number.isInteger(v) ? String(v) : String(Math.round(v * 100) / 100);
+// Cuando la frontera se ordena por g no hace falta mostrar la columna dos veces.
+const soloG = DATA.keyName === &quot;g&quot;;
+
+/* ---------- el mapa se dibuja una sola vez ---------- */
+
+const svg = el(&quot;svg&quot;);
+svg.setAttribute(&quot;viewBox&quot;, DATA.viewBox);
+const aristas = {}, nodos = {};
+
+for (const [a, b, km] of DATA.links) {
+  const [ax, ay] = DATA.cities[a], [bx, by] = DATA.cities[b];
+  const linea = document.createElementNS(SVGNS, &quot;line&quot;);
+  linea.setAttribute(&quot;class&quot;, &quot;e&quot;);
+  linea.setAttribute(&quot;x1&quot;, ax); linea.setAttribute(&quot;y1&quot;, ay);
+  linea.setAttribute(&quot;x2&quot;, bx); linea.setAttribute(&quot;y2&quot;, by);
+  svg.appendChild(linea);
+  aristas[a + &quot;|&quot; + b] = aristas[b + &quot;|&quot; + a] = linea;
+}
+for (const [a, b, km] of DATA.links) {
+  const [ax, ay] = DATA.cities[a], [bx, by] = DATA.cities[b];
+  const t = document.createElementNS(SVGNS, &quot;text&quot;);
+  t.setAttribute(&quot;class&quot;, &quot;km&quot;);
+  t.setAttribute(&quot;x&quot;, (ax + bx) / 2); t.setAttribute(&quot;y&quot;, (ay + by) / 2 + 3);
+  t.textContent = km;
+  svg.appendChild(t);
+}
+for (const ciudad of Object.keys(DATA.cities)) {
+  const [x, y] = DATA.cities[ciudad];
+  const grupo = document.createElementNS(SVGNS, &quot;g&quot;);
+  grupo.setAttribute(&quot;class&quot;, &quot;n&quot;);
+  const halo = document.createElementNS(SVGNS, &quot;circle&quot;);
+  halo.setAttribute(&quot;class&quot;, &quot;halo&quot;);
+  halo.setAttribute(&quot;cx&quot;, x); halo.setAttribute(&quot;cy&quot;, y); halo.setAttribute(&quot;r&quot;, 14);
+  const c = document.createElementNS(SVGNS, &quot;circle&quot;);
+  c.setAttribute(&quot;cx&quot;, x); c.setAttribute(&quot;cy&quot;, y); c.setAttribute(&quot;r&quot;, 6.5);
+  const t = document.createElementNS(SVGNS, &quot;text&quot;);
+  t.setAttribute(&quot;x&quot;, x); t.setAttribute(&quot;y&quot;, y - 12);
+  t.textContent = ciudad;
+  const titulo = document.createElementNS(SVGNS, &quot;title&quot;);
+  titulo.textContent = ciudad + &quot; — h = &quot; + (DATA.h[ciudad] ?? &quot;?&quot;);
+  grupo.append(halo, c, t, titulo);
+  svg.appendChild(grupo);
+  nodos[ciudad] = grupo;
+}
+
+/* ---------- el riel de pasos ---------- */
+
+let vueltaPrevia = null;
+DATA.frames.forEach((f, i) => {
+  // Cuando el algoritmo da vueltas (profundidad iterativa, bidireccional)
+  // el riel las separa con su etiqueta.
+  if (f.round &amp;&amp; f.round !== vueltaPrevia) {
+    const et = document.createElement(&quot;span&quot;);
+    et.className = &quot;et&quot;;
+    et.textContent = f.round;
+    el(&quot;riel&quot;).appendChild(et);
+    vueltaPrevia = f.round;
+  }
+  const b = document.createElement(&quot;button&quot;);
+  b.textContent = f.pop.state;
+  b.onclick = () => mostrar(i);
+  el(&quot;riel&quot;).appendChild(b);
+});
+
+/* ---------- dibujar un cuadro ---------- */
+
+let actual = 0;
+
+function mostrar(i) {
+  actual = Math.max(0, Math.min(i, DATA.frames.length - 1));
+  const f = DATA.frames[actual];
+
+  el(&quot;i&quot;).textContent = actual + 1;
+  el(&quot;prev&quot;).disabled = actual === 0;
+  el(&quot;next&quot;).disabled = actual === DATA.frames.length - 1;
+  [...el(&quot;riel&quot;).querySelectorAll(&quot;button&quot;)].forEach((b, j) =>
+    b.setAttribute(&quot;aria-current&quot;, j === actual));
+
+  /* POP */
+  el(&quot;pop-ciudad&quot;).textContent = f.pop.state;
+  el(&quot;pop-datos&quot;).innerHTML = &quot;g <b>&quot; + num(f.pop.g) + &quot;</b>&quot; +
+    (soloG ? &quot;&quot; : &quot;  &quot; + DATA.keyName + &quot; <b>&quot; + num(f.pop.key) + &quot;</b>&quot;);
+  el(&quot;pop-camino&quot;).textContent = f.pop.path.join(&quot;  →  &quot;);
+  el(&quot;vuelta&quot;).classList.toggle(&quot;oculto&quot;, !f.round);
+  el(&quot;vuelta&quot;).textContent = f.round || &quot;&quot;;
+
+  /* EXPAND */
+  el(&quot;caja-expand&quot;).classList.toggle(&quot;oculto&quot;, f.children.length === 0 &amp;&amp; !f.note);
+  el(&quot;nota&quot;).classList.toggle(&quot;oculto&quot;, !f.note);
+  el(&quot;nota&quot;).textContent = f.note || &quot;&quot;;
+  el(&quot;expand-n&quot;).textContent = f.children.length;
+  el(&quot;expand&quot;).innerHTML = f.children.map(ch => {
+    const sig = ch.kind === &quot;nuevo&quot; ? &quot;+&quot; : ch.kind === &quot;mejora&quot; ? &quot;↑&quot; : &quot;−&quot;;
+    return '<div class=&quot;hijo ' + ch.kind + '&quot;>' +
+      '<span class=&quot;sig&quot;>' + sig + '</span>' +
+      '<span class=&quot;ciudad&quot;>' + ch.state + '</span>' +
+      '<span class=&quot;val num&quot;>g ' + num(ch.g) + '</span>' +
+      '<span class=&quot;val num&quot;>' + (soloG ? &quot;&quot; : DATA.keyName + &quot; &quot; + num(ch.key)) + '</span>' +
+      '<span class=&quot;nota&quot;>' + ch.nota + '</span></div>';
+  }).join(&quot;&quot;);
+
+  /* FRONTIER */
+  el(&quot;frontier-n&quot;).textContent = f.frontier.length;
+  el(&quot;frontier&quot;).innerHTML = f.frontier.map((q, j) =>
+    '<div class=&quot;fila ' + (j === 0 ? &quot;top &quot; : &quot;&quot;) + (q.stale ? &quot;stale&quot; : &quot;&quot;) + '&quot;>' +
+    '<span class=&quot;pico&quot;>' + (j === 0 ? &quot;▸&quot; : &quot;&quot;) + '</span>' +
+    '<span class=&quot;ciudad&quot;>' + q.state + (q.stale ? '<span class=&quot;tag&quot;>obsoleto</span>' : &quot;&quot;) + '</span>' +
+    '<span class=&quot;val num&quot;>' + num(q.key) + '</span></div>').join(&quot;&quot;);
+
+  /* REACHED */
+  el(&quot;caja-reached&quot;).classList.toggle(&quot;oculto&quot;, f.reached === null);
+  if (f.reached) {
+    const conG = f.reached[0][1] !== null;
+    el(&quot;reached-n&quot;).textContent = f.reached.length;
+    el(&quot;reached&quot;).innerHTML = f.reached.map(([c, g]) =>
+      '<span class=&quot;chip&quot;>' + c + (conG ? ' <b class=&quot;num&quot;>' + num(g) + &quot;</b>&quot; : &quot;&quot;) +
+      &quot;</span>&quot;).join(&quot;&quot;);
+  }
+
+  /* REACHED del otro lado (solo bidireccional) */
+  el(&quot;caja-otros&quot;).classList.toggle(&quot;oculto&quot;, !f.otros);
+  if (f.otros) {
+    el(&quot;otros-n&quot;).textContent = f.otros.length;
+    el(&quot;otros&quot;).innerHTML = f.otros.map(c =>
+      '<span class=&quot;chip otro&quot;>' + c + &quot;</span>&quot;).join(&quot;&quot;);
+  }
+
+  /* DONE */
+  const done = el(&quot;done&quot;);
+  done.className = &quot;done &quot; + (f.done ? (f.done.kind === &quot;goal&quot; ? &quot;goal&quot; : &quot;fail&quot;) : &quot;oculto&quot;);
+  if (f.done &amp;&amp; f.done.kind === &quot;goal&quot;) {
+    done.innerHTML = &quot;<h3>IS_GOAL → solucion</h3>&quot; +
+      '<p class=&quot;ruta&quot;>' + f.done.path.join(&quot;  →  &quot;) + &quot;</p>&quot; +
+      '<p class=&quot;costo&quot;>costo <b class=&quot;num&quot;>' + num(f.done.cost) + &quot;</b></p>&quot;;
+  } else if (f.done) {
+    const esCutoff = f.done.kind === &quot;cutoff&quot;;
+    done.innerHTML = &quot;<h3>&quot; + (esCutoff ? &quot;cutoff&quot; : &quot;failure&quot;) + &quot;</h3><p>&quot; +
+      (esCutoff ? &quot;no hay solucion dentro del limite: puede haber mas abajo&quot;
+                : &quot;la frontera quedo vacia: no hay solucion&quot;) + &quot;</p>&quot;;
+  }
+
+  if (vista === &quot;mapa&quot;) pintarMapa(f); else pintarArbol(actual);
+}
+
+function pintarMapa(f) {
+  const enFrontera = new Set(f.frontier.filter(q => !q.stale).map(q => q.state));
+  const alcanzado = new Set((f.reached || []).map(r => r[0]));
+  // Sin reached (depth-first) marcamos las ciudades del camino actual.
+  if (!f.reached) f.pop.path.forEach(c => alcanzado.add(c));
+
+  const otros = new Set(f.otros || []);
+
+  for (const ciudad in nodos) {
+    const clases = [&quot;n&quot;];
+    if (ciudad === DATA.goal) clases.push(&quot;goal&quot;);
+    if (ciudad === f.pop.state) clases.push(&quot;pop&quot;);
+    else if (enFrontera.has(ciudad)) clases.push(&quot;frontier&quot;);
+    else if (alcanzado.has(ciudad)) clases.push(&quot;reached&quot;);
+    if (otros.has(ciudad)) clases.push(&quot;otro&quot;);
+    nodos[ciudad].setAttribute(&quot;class&quot;, clases.join(&quot; &quot;));
+    const esPop = ciudad === f.pop.state;
+    nodos[ciudad].querySelector(&quot;circle:not(.halo)&quot;).setAttribute(&quot;r&quot;, esPop ? 8.5 : 6.5);
+    // La etiqueta sube un poco para no chocar con el halo del nodo actual.
+    nodos[ciudad].querySelector(&quot;text&quot;).setAttribute(&quot;y&quot;, DATA.cities[ciudad][1] - (esPop ? 19 : 12));
+  }
+
+  const camino = (f.done &amp;&amp; f.done.kind === &quot;goal&quot;) ? f.done.path : f.pop.path;
+  const clase = (f.done &amp;&amp; f.done.kind === &quot;goal&quot;) ? &quot;e sol&quot; : &quot;e path&quot;;
+  for (const k in aristas) aristas[k].setAttribute(&quot;class&quot;, &quot;e&quot;);
+  for (let j = 0; j < camino.length - 1; j++) {
+    const linea = aristas[camino[j] + &quot;|&quot; + camino[j + 1]];
+    if (linea) linea.setAttribute(&quot;class&quot;, clase);
+  }
+}
+
+/* ---------- el arbol de busqueda ---------- */
+
+/* El mapa tiene un circulo por ciudad; el arbol tiene uno por camino que
+   llega a esa ciudad. Esa es toda la diferencia entre el espacio de estados
+   y el arbol de busqueda, y es la que no se puede dibujar sobre el mapa. */
+
+const svgArbol = el(&quot;arbol&quot;);
+const PASO_X = 78, PASO_Y = 64;
+
+function armarArbol(hasta) {
+  // Se rearma de cero en cada cuadro: al riel se le puede saltar a
+  // cualquier paso, asi que no sirve ir acumulando.
+  let nodos = new Map(), raices = [];
+  let expandidos = new Set(), descartados = new Set();
+  const meter = (d) => { if (!nodos.has(d.id)) nodos.set(d.id, {...d, hijos: []}); };
+
+  for (let k = 0; k <= hasta; k++) {
+    const f = DATA.frames[k];
+    if (f.pop.parent === null &amp;&amp; !nodos.has(f.pop.id)) {
+      // Una raiz nueva con la misma ciudad que otra raiz es una vuelta
+      // nueva: profundidad iterativa tira el arbol y lo rehace. Con otra
+      // ciudad es el otro lado, y ahi son dos arboles a la vez.
+      if (raices.some(r => nodos.get(r).state === f.pop.state)) {
+        nodos = new Map(); raices = [];
+        expandidos = new Set(); descartados = new Set();
+      }
+      raices.push(f.pop.id);
+    }
+    meter(f.pop);
+    if (k < hasta) expandidos.add(f.pop.id);
+    for (const ch of f.children) {
+      meter(ch);
+      if (ch.kind === &quot;descartado&quot;) descartados.add(ch.id);
+    }
+  }
+  for (const n of nodos.values()) {
+    const padre = nodos.get(n.parent);
+    if (padre) padre.hijos.push(n.id);
+  }
+  return { nodos, raices, expandidos, descartados };
+}
+
+function acomodar(nodos, raices) {
+  // Cada hoja ocupa una columna; cada padre se centra sobre sus hijos.
+  let columna = 0;
+  const ubicar = (id) => {
+    const n = nodos.get(id);
+    if (n.hijos.length === 0) {
+      n.x = columna++ * PASO_X;
+    } else {
+      n.hijos.forEach(ubicar);
+      const xs = n.hijos.map(h => nodos.get(h).x);
+      n.x = (xs[0] + xs[xs.length - 1]) / 2;
+    }
+    n.y = n.depth * PASO_Y;
+  };
+  raices.forEach(r => { ubicar(r); columna += 1; });
+}
+
+function pintarArbol(i) {
+  const f = DATA.frames[i];
+  const { nodos, raices, expandidos, descartados } = armarArbol(i);
+  acomodar(nodos, raices);
+
+  const xs = [...nodos.values()].map(n => n.x);
+  const ys = [...nodos.values()].map(n => n.y);
+  const borde = 46;
+  const ancho = Math.max(...xs) - Math.min(...xs) + 2 * borde;
+  const alto = Math.max(...ys) + 2 * borde;
+  svgArbol.setAttribute(&quot;viewBox&quot;,
+    (Math.min(...xs) - borde) + &quot; &quot; + (-borde) + &quot; &quot; + ancho + &quot; &quot; + alto);
+  // Un punto del dibujo es un pixel: los nombres se leen siempre igual.
+  svgArbol.setAttribute(&quot;width&quot;, ancho);
+  svgArbol.setAttribute(&quot;height&quot;, alto);
+  svgArbol.textContent = &quot;&quot;;
+
+  // El camino del nodo actual hasta la raiz, marcado como en el mapa.
+  let punta = f.pop.id;
+  if (f.done &amp;&amp; f.done.kind === &quot;goal&quot;) {
+    for (const n of nodos.values()) {
+      if (n.state === DATA.goal &amp;&amp; n.g === f.done.cost) punta = n.id;
+    }
+  }
+  const camino = new Set();
+  for (let id = punta; nodos.has(id); id = nodos.get(id).parent) camino.add(id);
+
+  // primero las ramas, para que queden abajo de los nodos
+  for (const n of nodos.values()) {
+    const padre = nodos.get(n.parent);
+    if (!padre) continue;
+    const linea = document.createElementNS(SVGNS, &quot;line&quot;);
+    linea.setAttribute(&quot;class&quot;, camino.has(n.id) ? &quot;rama sol&quot; : &quot;rama&quot;);
+    linea.setAttribute(&quot;x1&quot;, padre.x); linea.setAttribute(&quot;y1&quot;, padre.y);
+    linea.setAttribute(&quot;x2&quot;, n.x); linea.setAttribute(&quot;y2&quot;, n.y);
+    svgArbol.appendChild(linea);
+  }
+
+  for (const n of nodos.values()) {
+    // Generado y todavia sin expandir es, en estos algoritmos, estar en la
+    // frontera: todo hijo que no se descarta entra a la cola.
+    const estado = n.id === f.pop.id ? &quot;pop&quot;
+                 : expandidos.has(n.id) ? &quot;reached&quot;
+                 : descartados.has(n.id) ? &quot;descartado&quot;
+                 : &quot;frontier&quot;;
+    const clases = [&quot;n&quot;, estado];
+    if (n.state === DATA.goal) clases.push(&quot;goal&quot;);
+    const esPop = estado === &quot;pop&quot;;
+
+    const grupo = document.createElementNS(SVGNS, &quot;g&quot;);
+    grupo.setAttribute(&quot;class&quot;, clases.join(&quot; &quot;));
+    const halo = document.createElementNS(SVGNS, &quot;circle&quot;);
+    halo.setAttribute(&quot;class&quot;, &quot;halo&quot;);
+    halo.setAttribute(&quot;cx&quot;, n.x); halo.setAttribute(&quot;cy&quot;, n.y); halo.setAttribute(&quot;r&quot;, 14);
+    const c = document.createElementNS(SVGNS, &quot;circle&quot;);
+    c.setAttribute(&quot;cx&quot;, n.x); c.setAttribute(&quot;cy&quot;, n.y);
+    c.setAttribute(&quot;r&quot;, esPop ? 8.5 : 6.5);
+    const t = document.createElementNS(SVGNS, &quot;text&quot;);
+    t.setAttribute(&quot;x&quot;, n.x); t.setAttribute(&quot;y&quot;, n.y - (esPop ? 19 : 13));
+    t.textContent = n.state;
+    const g = document.createElementNS(SVGNS, &quot;text&quot;);
+    g.setAttribute(&quot;class&quot;, &quot;g&quot;);
+    g.setAttribute(&quot;x&quot;, n.x); g.setAttribute(&quot;y&quot;, n.y + 19);
+    g.textContent = num(n.g);
+    grupo.append(halo, c, t, g);
+    svgArbol.appendChild(grupo);
+  }
+
+  // La caja sigue al nodo que se esta expandiendo: en un arbol grande, si
+  // no, la busqueda se va de pantalla y hay que ir a buscarla a mano.
+  const caja = el(&quot;caja-arbol&quot;), aca = nodos.get(f.pop.id);
+  if (aca) {
+    caja.scrollLeft = aca.x - Math.min(...xs) + borde - caja.clientWidth / 2;
+    caja.scrollTop = aca.y + borde - caja.clientHeight / 2;
+  }
+}
+
+/* ---------- controles ---------- */
+
+let vista = &quot;mapa&quot;;
+
+function cambiarVista(v) {
+  vista = v;
+  el(&quot;v-mapa&quot;).setAttribute(&quot;aria-pressed&quot;, v === &quot;mapa&quot;);
+  el(&quot;v-arbol&quot;).setAttribute(&quot;aria-pressed&quot;, v === &quot;arbol&quot;);
+  el(&quot;svg&quot;).classList.toggle(&quot;oculto&quot;, v !== &quot;mapa&quot;);
+  el(&quot;caja-arbol&quot;).classList.toggle(&quot;oculto&quot;, v !== &quot;arbol&quot;);
+  mostrar(actual);
+}
+el(&quot;v-mapa&quot;).onclick = () => cambiarVista(&quot;mapa&quot;);
+el(&quot;v-arbol&quot;).onclick = () => cambiarVista(&quot;arbol&quot;);
+
+el(&quot;nombre&quot;).textContent = DATA.name;
+el(&quot;label&quot;).textContent = DATA.label;
+el(&quot;ruta-titulo&quot;).textContent = DATA.initial + &quot; → &quot; + DATA.goal;
+el(&quot;n&quot;).textContent = DATA.frames.length;
+el(&quot;prev&quot;).onclick = () => mostrar(actual - 1);
+el(&quot;next&quot;).onclick = () => mostrar(actual + 1);
+document.addEventListener(&quot;keydown&quot;, (ev) => {
+  if (ev.key === &quot;ArrowRight&quot; || ev.key === &quot; &quot;) { mostrar(actual + 1); ev.preventDefault(); }
+  if (ev.key === &quot;ArrowLeft&quot;) { mostrar(actual - 1); ev.preventDefault(); }
+  if (ev.key === &quot;Home&quot;) mostrar(0);
+  if (ev.key === &quot;End&quot;) mostrar(DATA.frames.length - 1);
+});
+
+mostrar(0);
+</script>
+" style="width:100%; height:800px; border:1px solid #dee2e6; border-radius:.25rem" title="la busqueda paso a paso"></iframe></div>
+</div>
+</div>
 <p>Definimos el método <code>IS_CYCLE</code> para cortarlo, mirando los ancestros del nodo.</p>
-<div id="c36" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.857187Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.857014Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.860219Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.859588Z&quot;}}" data-execution_count="20">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> is_cycle(node, k<span class="op">=</span><span class="dv">30</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""IS-CYCLE(node): el estado del nodo ya aparece en sus ancestros."""</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> find(ancestor, k):</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (ancestor <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">and</span> k <span class="op">&gt;</span> <span class="dv">0</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                <span class="kw">and</span> (ancestor.STATE <span class="op">==</span> node.STATE <span class="kw">or</span> find(ancestor.PARENT, k <span class="op">-</span> <span class="dv">1</span>)))</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> find(node.PARENT, k)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c36" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.857187Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.857014Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.860219Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.859588Z&quot;}}" data-execution_count="21">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> is_cycle(node, k<span class="op">=</span><span class="dv">30</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""IS-CYCLE(node): el estado del nodo ya aparece en sus ancestros."""</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> find(ancestor, k):</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (ancestor <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">and</span> k <span class="op">&gt;</span> <span class="dv">0</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>                <span class="kw">and</span> (ancestor.STATE <span class="op">==</span> node.STATE <span class="kw">or</span> find(ancestor.PARENT, k <span class="op">-</span> <span class="dv">1</span>)))</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> find(node.PARENT, k)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="c37" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.861954Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.861766Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.868075Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.866573Z&quot;}}" data-execution_count="21">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> depth_first_search(problem, view<span class="op">=</span>silent):</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Baja por una rama hasta el fondo antes de probar la siguiente."""</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    frontier <span class="op">=</span> LIFOQueue([Node(STATE<span class="op">=</span>problem.INITIAL)])</span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="kw">not</span> frontier.IS_EMPTY():</span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>        node <span class="op">=</span> frontier.POP()</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>        view.POP(node, frontier, <span class="va">None</span>)</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> problem.IS_GOAL(node.STATE):</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>            view.DONE(node, frontier, <span class="va">None</span>)</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> node</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> is_cycle(node):</span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> child <span class="kw">in</span> expand(problem, node):</span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>                view.CHILD(child, <span class="va">None</span>)</span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>                frontier.ADD(child)</span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>            view.NOTE(<span class="st">"IS_CYCLE: esta ciudad ya esta en el camino, no se expande"</span>)</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>        view.STEP(frontier, <span class="va">None</span>)</span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>    view.DONE(failure, frontier, <span class="va">None</span>)</span>
-<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> failure</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c37" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.861954Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.861766Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.868075Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.866573Z&quot;}}" data-execution_count="22">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> depth_first_search(problem, view<span class="op">=</span>silent):</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Baja por una rama hasta el fondo antes de probar la siguiente."""</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    frontier <span class="op">=</span> LIFOQueue([Node(STATE<span class="op">=</span>problem.INITIAL)])</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="kw">not</span> frontier.IS_EMPTY():</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>        node <span class="op">=</span> frontier.POP()</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>        view.POP(node, frontier, <span class="va">None</span>)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> problem.IS_GOAL(node.STATE):</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>            view.DONE(node, frontier, <span class="va">None</span>)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> node</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> is_cycle(node):</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> child <span class="kw">in</span> expand(problem, node):</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>                view.CHILD(child, <span class="va">None</span>)</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>                frontier.ADD(child)</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>            view.NOTE(<span class="st">"IS_CYCLE: esta ciudad ya esta en el camino, no se expande"</span>)</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>        view.STEP(frontier, <span class="va">None</span>)</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>    view.DONE(failure, frontier, <span class="va">None</span>)</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> failure</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="c38" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.870636Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.870388Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.878516Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.877385Z&quot;}}" data-execution_count="22">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>profundidad <span class="op">=</span> Web(problem, <span class="st">"DEPTH-FIRST-SEARCH"</span>, <span class="st">"pila LIFO, sin reached"</span>,</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                  key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>solucion_profundidad <span class="op">=</span> depth_first_search(problem, view<span class="op">=</span>profundidad)</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">" -&gt; "</span>.join(path_states(solucion_profundidad)))</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"costo:"</span>, solucion_profundidad.PATH_COST)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c38" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.870636Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.870388Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.878516Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.877385Z&quot;}}" data-execution_count="23">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>profundidad <span class="op">=</span> Web(problem, <span class="st">"DEPTH-FIRST-SEARCH"</span>, <span class="st">"pila LIFO, sin reached"</span>,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                  key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>solucion_profundidad <span class="op">=</span> depth_first_search(problem, view<span class="op">=</span>profundidad)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">" -&gt; "</span>.join(path_states(solucion_profundidad)))</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"costo:"</span>, solucion_profundidad.PATH_COST)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Arad -&gt; Zerind -&gt; Oradea -&gt; Sibiu -&gt; Rimnicu -&gt; Pitesti -&gt; Bucharest
 costo: 575</code></pre>
@@ -2152,9 +2846,9 @@ costo: 575</code></pre>
 <p>Solución encontrada: <strong>575 km y 7 ciudades.</strong></p>
 <p>Además nueve ciudades se expanden más de una vez y <code>IS_CYCLE</code> se dispara diez veces. Ocupamos menos memoria pero gastamos más computo.</p>
 <p>Y mirá cómo arranca: <strong>Arad → Zerind → Oradea</strong>, las mismas tres ciudades del bucle de recién. En la cuarta vuelta la pila vuelve a ofrecer Zerind, <code>IS_CYCLE</code> la encuentra entre los ancestros y no la expande, así que sale el que quedaba abajo, Sibiu, y por ahí llega. Esa guarda es toda la diferencia entre las dos corridas.</p>
-<div id="c40" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.882074Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.881687Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.895527Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.894928Z&quot;}}" data-execution_count="23">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>ver(profundidad)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display column-screen-inset" data-execution_count="23">
+<div id="c40" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.882074Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.881687Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.895527Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.894928Z&quot;}}" data-execution_count="24">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>ver(profundidad)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display column-screen-inset" data-execution_count="24">
 <div><iframe srcdoc="<title>Arad a Bucharest</title>
 <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
 <link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&amp;display=swap&quot;>
@@ -2844,55 +3538,55 @@ mostrar(0);
 <h3 class="anchored" data-anchor-id="profundidad-limitada">2.5 — Profundidad limitada</h3>
 <p>Al tomar una rama y profundizar hasta que termine puede pasar que se caiga en en un espacio infinito. Una solución es ponerle un límite de pasos <code>l</code> y no expandir nada más profundo que eso.</p>
 <p>Solo hay que agregar este límite al algoritmo:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> failure          <span class="co"># &lt;- lo que devolvemos si no encontramos</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>...</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> depth(node) <span class="op">&gt;</span> l:       <span class="co"># &lt;- el techo</span></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> cutoff       <span class="co"># &lt;- Marcar como corte por límite</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> <span class="kw">not</span> is_cycle(node):</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    ...</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> failure          <span class="co"># &lt;- lo que devolvemos si no encontramos</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> depth(node) <span class="op">&gt;</span> l:       <span class="co"># &lt;- el techo</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> cutoff       <span class="co"># &lt;- Marcar como corte por límite</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> <span class="kw">not</span> is_cycle(node):</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    ...</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Ahora tenemos un tercer valor de retorno.</p>
 <p>Un <strong>nodo objetivo</strong> puede encontrar: - <strong><code>failure</code></strong>: no hay solución, se recorrió todo lo que se podía; - <strong><code>cutoff</code></strong>: no encontró dentro del límite, pero podría haber solución más abajo.</p>
-<div id="c42" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.897904Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.897729Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.903310Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.902030Z&quot;}}" data-execution_count="24">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> depth_limited_search(problem, l<span class="op">=</span>math.inf, view<span class="op">=</span>silent):</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Baja por una rama hasta el limite `l` antes de probar la siguiente."""</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>    frontier <span class="op">=</span> LIFOQueue([Node(STATE<span class="op">=</span>problem.INITIAL)])</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> failure</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="kw">not</span> frontier.IS_EMPTY():</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>        node <span class="op">=</span> frontier.POP()</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>        view.POP(node, frontier, <span class="va">None</span>)</span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> problem.IS_GOAL(node.STATE):</span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>            view.DONE(node, frontier, <span class="va">None</span>)</span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> node</span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> depth(node) <span class="op">&gt;</span> l:</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> cutoff</span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>            view.NOTE(<span class="ss">f"pasa el limite l = </span><span class="sc">{</span>l<span class="sc">}</span><span class="ss">: no se expande"</span>)</span>
-<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="kw">not</span> is_cycle(node):</span>
-<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> child <span class="kw">in</span> expand(problem, node):</span>
-<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a>                view.CHILD(child, <span class="va">None</span>)</span>
-<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a>                frontier.ADD(child)</span>
-<span id="cb33-18"><a href="#cb33-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb33-19"><a href="#cb33-19" aria-hidden="true" tabindex="-1"></a>            view.NOTE(<span class="st">"IS_CYCLE: esta ciudad ya esta en el camino, no se expande"</span>)</span>
-<span id="cb33-20"><a href="#cb33-20" aria-hidden="true" tabindex="-1"></a>        view.STEP(frontier, <span class="va">None</span>)</span>
-<span id="cb33-21"><a href="#cb33-21" aria-hidden="true" tabindex="-1"></a>    view.DONE(result, frontier, <span class="va">None</span>)</span>
-<span id="cb33-22"><a href="#cb33-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c42" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.897904Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.897729Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.903310Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.902030Z&quot;}}" data-execution_count="25">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> depth_limited_search(problem, l<span class="op">=</span>math.inf, view<span class="op">=</span>silent):</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Baja por una rama hasta el limite `l` antes de probar la siguiente."""</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    frontier <span class="op">=</span> LIFOQueue([Node(STATE<span class="op">=</span>problem.INITIAL)])</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> failure</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="kw">not</span> frontier.IS_EMPTY():</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>        node <span class="op">=</span> frontier.POP()</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>        view.POP(node, frontier, <span class="va">None</span>)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> problem.IS_GOAL(node.STATE):</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>            view.DONE(node, frontier, <span class="va">None</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> node</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> depth(node) <span class="op">&gt;</span> l:</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>            result <span class="op">=</span> cutoff</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>            view.NOTE(<span class="ss">f"pasa el limite l = </span><span class="sc">{</span>l<span class="sc">}</span><span class="ss">: no se expande"</span>)</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="kw">not</span> is_cycle(node):</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> child <span class="kw">in</span> expand(problem, node):</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>                view.CHILD(child, <span class="va">None</span>)</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>                frontier.ADD(child)</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb34-19"><a href="#cb34-19" aria-hidden="true" tabindex="-1"></a>            view.NOTE(<span class="st">"IS_CYCLE: esta ciudad ya esta en el camino, no se expande"</span>)</span>
+<span id="cb34-20"><a href="#cb34-20" aria-hidden="true" tabindex="-1"></a>        view.STEP(frontier, <span class="va">None</span>)</span>
+<span id="cb34-21"><a href="#cb34-21" aria-hidden="true" tabindex="-1"></a>    view.DONE(result, frontier, <span class="va">None</span>)</span>
+<span id="cb34-22"><a href="#cb34-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> result</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Con <code>l = ∞</code> es exactamente la búsqueda en profundidad anterior.</p>
-<div id="c44" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.905418Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.905174Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.909246Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.908295Z&quot;}}" data-execution_count="25">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(path_states(depth_limited_search(problem, math.inf)))</span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(path_states(depth_first_search(problem)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c44" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.905418Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.905174Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.909246Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.908295Z&quot;}}" data-execution_count="26">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(path_states(depth_limited_search(problem, math.inf)))</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(path_states(depth_first_search(problem)))</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>['Arad', 'Zerind', 'Oradea', 'Sibiu', 'Rimnicu', 'Pitesti', 'Bucharest']
 ['Arad', 'Zerind', 'Oradea', 'Sibiu', 'Rimnicu', 'Pitesti', 'Bucharest']</code></pre>
 </div>
 </div>
 <p>Con límites chicos podemos ver el cutoff:</p>
-<div id="c46" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.910887Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.910706Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.915076Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.914197Z&quot;}}" data-execution_count="26">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> l <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">6</span>):</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> depth_limited_search(problem, l)</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> r <span class="kw">is</span> cutoff:</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"l = </span><span class="sc">{</span>l<span class="sc">}</span><span class="ss">   cutoff"</span>)</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"l = </span><span class="sc">{</span>l<span class="sc">}</span><span class="ss">   costo </span><span class="sc">{</span>r<span class="sc">.</span>PATH_COST<span class="sc">:&gt;3g}</span><span class="ss">   </span><span class="sc">{</span><span class="st">' -&gt; '</span><span class="sc">.</span>join(path_states(r))<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c46" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.910887Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.910706Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.915076Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.914197Z&quot;}}" data-execution_count="27">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> l <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">6</span>):</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> depth_limited_search(problem, l)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> r <span class="kw">is</span> cutoff:</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"l = </span><span class="sc">{</span>l<span class="sc">}</span><span class="ss">   cutoff"</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"l = </span><span class="sc">{</span>l<span class="sc">}</span><span class="ss">   costo </span><span class="sc">{</span>r<span class="sc">.</span>PATH_COST<span class="sc">:&gt;3g}</span><span class="ss">   </span><span class="sc">{</span><span class="st">' -&gt; '</span><span class="sc">.</span>join(path_states(r))<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>l = 0   cutoff
 l = 1   cutoff
@@ -2903,14 +3597,14 @@ l = 5   costo 575   Arad -&gt; Zerind -&gt; Oradea -&gt; Sibiu -&gt; Rimnicu -&g
 </div>
 </div>
 <p>Subir el límite puede dar una peor solución: Teniendo más libertad para bajar por una misma rama puede terminar encontrando en una de las primera un camino que cumpla el objetivo pero que no sea el óptimo.</p>
-<div id="c48" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.917382Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.917130Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.924385Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.923319Z&quot;}}" data-execution_count="27">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>LIMITE <span class="op">=</span> <span class="dv">2</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>limitada <span class="op">=</span> Web(problem, <span class="st">"DEPTH-LIMITED-SEARCH"</span>, <span class="st">"pila LIFO, l = 1"</span>,</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>               key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>depth_limited_search(problem, LIMITE, view<span class="op">=</span>limitada)</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>ver(limitada)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display column-screen-inset" data-execution_count="27">
+<div id="c48" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.917382Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.917130Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.924385Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.923319Z&quot;}}" data-execution_count="28">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>LIMITE <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>limitada <span class="op">=</span> Web(problem, <span class="st">"DEPTH-LIMITED-SEARCH"</span>, <span class="st">"pila LIFO, l = 1"</span>,</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>               key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>depth_limited_search(problem, LIMITE, view<span class="op">=</span>limitada)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>ver(limitada)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display column-screen-inset" data-execution_count="28">
 <div><iframe srcdoc="<title>Arad a Bucharest</title>
 <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
 <link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&amp;display=swap&quot;>
@@ -3600,33 +4294,33 @@ mostrar(0);
 <h3 class="anchored" data-anchor-id="profundidad-iterativa">2.6 — Profundidad iterativa</h3>
 <p>Búsqueda en profundidad limitada, pero probando <code>l = 0, 1, 2, ...</code> hasta encontrar. Se queda con lo mejor de los dos lados: la memoria de la búsqueda en profundidad —lineal con la profundidad— y la garantía de la búsqueda en amplitud de encontrar primero la solución más superficial.</p>
 <p>Parece un desperdicio rehacer el trabajo en cada vuelta, pero no lo es: el último nivel tiene más nodos que todos los anteriores juntos, así que la última vuelta pesa más que todas las anteriores sumadas.</p>
-<div id="c50" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.927650Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.927432Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.931157Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.930297Z&quot;}}" data-execution_count="28">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> iterative_deepening_search(problem, view<span class="op">=</span>silent):</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Prueba con limite 0, 1, 2, ... hasta encontrar."""</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># En el libro esta variable se llama `depth`; aca `l`, para no pisar</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># la funcion DEPTH(node).</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> l <span class="kw">in</span> count():</span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>        view.ROUND(<span class="ss">f"l = </span><span class="sc">{</span>l<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> depth_limited_search(problem, l, view<span class="op">=</span>view)</span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> result <span class="kw">is</span> <span class="kw">not</span> cutoff:</span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> result</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c50" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.927650Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.927432Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.931157Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.930297Z&quot;}}" data-execution_count="29">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> iterative_deepening_search(problem, view<span class="op">=</span>silent):</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Prueba con limite 0, 1, 2, ... hasta encontrar."""</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># En el libro esta variable se llama `depth`; aca `l`, para no pisar</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># la funcion DEPTH(node).</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> l <span class="kw">in</span> count():</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>        view.ROUND(<span class="ss">f"l = </span><span class="sc">{</span>l<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> depth_limited_search(problem, l, view<span class="op">=</span>view)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> result <span class="kw">is</span> <span class="kw">not</span> cutoff:</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> result</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="c51" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.933155Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.932904Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.940333Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.939163Z&quot;}}" data-execution_count="29">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>iterativa <span class="op">=</span> Web(problem, <span class="st">"ITERATIVE-DEEPENING-SEARCH"</span>,</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">"depth-limited con l = 0, 1, 2, ..."</span>,</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>                key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>solucion_iterativa <span class="op">=</span> iterative_deepening_search(problem, view<span class="op">=</span>iterativa)</span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">" -&gt; "</span>.join(path_states(solucion_iterativa)))</span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"costo:"</span>, solucion_iterativa.PATH_COST)</span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> l <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    vuelta <span class="op">=</span> Web(problem, <span class="st">""</span>, <span class="st">""</span>, key<span class="op">=</span>depth)</span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>    depth_limited_search(problem, l, view<span class="op">=</span>vuelta)</span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"l = </span><span class="sc">{</span>l<span class="sc">:&lt;5}</span><span class="ss"> </span><span class="sc">{</span>vuelta<span class="sc">.</span>pops<span class="sc">:&gt;3}</span><span class="ss"> expansiones"</span>)</span>
-<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'total'</span><span class="sc">:&lt;9}</span><span class="ss"> </span><span class="sc">{</span>iterativa<span class="sc">.</span>pops<span class="sc">:&gt;3}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c51" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.933155Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.932904Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.940333Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.939163Z&quot;}}" data-execution_count="30">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>iterativa <span class="op">=</span> Web(problem, <span class="st">"ITERATIVE-DEEPENING-SEARCH"</span>,</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>                <span class="st">"depth-limited con l = 0, 1, 2, ..."</span>,</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>                key<span class="op">=</span>depth, key_name<span class="op">=</span><span class="st">"prof"</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>solucion_iterativa <span class="op">=</span> iterative_deepening_search(problem, view<span class="op">=</span>iterativa)</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">" -&gt; "</span>.join(path_states(solucion_iterativa)))</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"costo:"</span>, solucion_iterativa.PATH_COST)</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> l <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>    vuelta <span class="op">=</span> Web(problem, <span class="st">""</span>, <span class="st">""</span>, key<span class="op">=</span>depth)</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>    depth_limited_search(problem, l, view<span class="op">=</span>vuelta)</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"l = </span><span class="sc">{</span>l<span class="sc">:&lt;5}</span><span class="ss"> </span><span class="sc">{</span>vuelta<span class="sc">.</span>pops<span class="sc">:&gt;3}</span><span class="ss"> expansiones"</span>)</span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'total'</span><span class="sc">:&lt;9}</span><span class="ss"> </span><span class="sc">{</span>iterativa<span class="sc">.</span>pops<span class="sc">:&gt;3}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Arad -&gt; Sibiu -&gt; Fagaras -&gt; Bucharest
 costo: 450
@@ -3638,9 +4332,9 @@ total      38</code></pre>
 </div>
 </div>
 <p>Devolvió lo mismo que la búsqueda en amplitud: 450 km y 3 ciudades. La solución de menos pasos. ¿Por qué?</p>
-<div id="c53" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.941981Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.941786Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.946978Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.946058Z&quot;}}" data-execution_count="30">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>ver(iterativa)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display column-screen-inset" data-execution_count="30">
+<div id="c53" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.941981Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.941786Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.946978Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.946058Z&quot;}}" data-execution_count="31">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>ver(iterativa)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display column-screen-inset" data-execution_count="31">
 <div><iframe srcdoc="<title>Arad a Bucharest</title>
 <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
 <link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&amp;display=swap&quot;>
@@ -4330,112 +5024,112 @@ mostrar(0);
 <h3 class="anchored" data-anchor-id="búsqueda-bidireccional">2.7 — Búsqueda bidireccional</h3>
 <p>Dos búsquedas a la vez: una que sale de Arad hacia adelante y otra que sale de Bucharest hacia atrás, hasta que se cruzan en alguna ciudad del medio.</p>
 <p>Tres funciones auxiliares antes del algoritmo:</p>
-<div id="c55" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.950344Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.949942Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.957712Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.957037Z&quot;}}" data-execution_count="31">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> terminated(solution, frontier_f, frontier_b, f_f, f_b):</span>
-<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""TERMINATED: ya no puede aparecer una solucion mejor.</span></span>
-<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Si los dos nodos de arriba juntos ya cuestan mas que el mejor camino</span></span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="co">    que tenemos, cualquier camino que quede por armar va a ser peor.</span></span>
-<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Mientras no haya solucion, PATH_COST de `failure` es infinito y esto</span></span>
-<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="co">    nunca corta.</span></span>
-<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> frontier_f.IS_EMPTY() <span class="kw">or</span> frontier_b.IS_EMPTY():</span>
-<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">True</span></span>
-<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> f_f(frontier_f.TOP()) <span class="op">+</span> f_b(frontier_b.TOP()) <span class="op">&gt;</span> solution.PATH_COST</span>
-<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> join_nodes(<span class="bu">dir</span>, node1, node2):</span>
-<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""JOIN-NODES: pega el camino de ida con el de vuelta dado vuelta.</span></span>
-<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a><span class="co">    Los dos nodos estan en la misma ciudad. El de ida trae el camino</span></span>
-<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a><span class="co">    desde INITIAL; el de vuelta trae el camino hasta GOAL, pero armado</span></span>
-<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a><span class="co">    al reves, asi que hay que rehacerlo hacia adelante.</span></span>
-<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>    ida, vuelta <span class="op">=</span> (node1, node2) <span class="cf">if</span> <span class="bu">dir</span> <span class="op">==</span> <span class="st">"F"</span> <span class="cf">else</span> (node2, node1)</span>
-<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>    node <span class="op">=</span> ida</span>
-<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> vuelta.PARENT <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a>        paso <span class="op">=</span> vuelta.PATH_COST <span class="op">-</span> vuelta.PARENT.PATH_COST</span>
-<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># El camino de vuelta sabe por que ciudades pasa, pero no con</span></span>
-<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>        <span class="co"># que accion se llega a cada una yendo para adelante.</span></span>
-<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>        node <span class="op">=</span> Node(STATE<span class="op">=</span>vuelta.PARENT.STATE, PARENT<span class="op">=</span>node, ACTION<span class="op">=</span><span class="va">None</span>,</span>
-<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a>                    PATH_COST<span class="op">=</span>node.PATH_COST <span class="op">+</span> paso)</span>
-<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a>        vuelta <span class="op">=</span> vuelta.PARENT</span>
-<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> node</span>
-<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-32"><a href="#cb43-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-33"><a href="#cb43-33" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> proceed(<span class="bu">dir</span>, problem, frontier, reached, reached2, solution, view<span class="op">=</span>silent):</span>
-<span id="cb43-34"><a href="#cb43-34" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Expande un nodo de un lado y lo compara contra el otro lado.</span></span>
-<span id="cb43-35"><a href="#cb43-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb43-36"><a href="#cb43-36" aria-hidden="true" tabindex="-1"></a><span class="co">    `dir` es F si el que avanza es el de ida, B si es el de vuelta.</span></span>
-<span id="cb43-37"><a href="#cb43-37" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb43-38"><a href="#cb43-38" aria-hidden="true" tabindex="-1"></a>    node <span class="op">=</span> frontier.POP()</span>
-<span id="cb43-39"><a href="#cb43-39" aria-hidden="true" tabindex="-1"></a>    view.POP(node, frontier, reached)</span>
-<span id="cb43-40"><a href="#cb43-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> child <span class="kw">in</span> expand(problem, node):</span>
-<span id="cb43-41"><a href="#cb43-41" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> child.STATE</span>
-<span id="cb43-42"><a href="#cb43-42" aria-hidden="true" tabindex="-1"></a>        view.CHILD(child, reached)</span>
-<span id="cb43-43"><a href="#cb43-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> s <span class="kw">not</span> <span class="kw">in</span> reached <span class="kw">or</span> child.PATH_COST <span class="op">&lt;</span> reached[s].PATH_COST:</span>
-<span id="cb43-44"><a href="#cb43-44" aria-hidden="true" tabindex="-1"></a>            reached[s] <span class="op">=</span> child</span>
-<span id="cb43-45"><a href="#cb43-45" aria-hidden="true" tabindex="-1"></a>            frontier.ADD(child)</span>
-<span id="cb43-46"><a href="#cb43-46" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> s <span class="kw">in</span> reached2:</span>
-<span id="cb43-47"><a href="#cb43-47" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Los dos lados llegaron a la misma ciudad: hay camino</span></span>
-<span id="cb43-48"><a href="#cb43-48" aria-hidden="true" tabindex="-1"></a>                <span class="co"># entero. Puede que no sea el mejor, asi que se compara.</span></span>
-<span id="cb43-49"><a href="#cb43-49" aria-hidden="true" tabindex="-1"></a>                solution2 <span class="op">=</span> join_nodes(<span class="bu">dir</span>, child, reached2[s])</span>
-<span id="cb43-50"><a href="#cb43-50" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> solution2.PATH_COST <span class="op">&lt;</span> solution.PATH_COST:</span>
-<span id="cb43-51"><a href="#cb43-51" aria-hidden="true" tabindex="-1"></a>                    solution <span class="op">=</span> solution2</span>
-<span id="cb43-52"><a href="#cb43-52" aria-hidden="true" tabindex="-1"></a>                    view.NOTE(<span class="ss">f"se cruzan en </span><span class="sc">{</span>s<span class="sc">}</span><span class="ss">: "</span></span>
-<span id="cb43-53"><a href="#cb43-53" aria-hidden="true" tabindex="-1"></a>                              <span class="ss">f"camino entero de </span><span class="sc">{</span>solution<span class="sc">.</span>PATH_COST<span class="sc">:g}</span><span class="ss">"</span>)</span>
-<span id="cb43-54"><a href="#cb43-54" aria-hidden="true" tabindex="-1"></a>    view.STEP(frontier, reached)</span>
-<span id="cb43-55"><a href="#cb43-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> solution</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c55" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.950344Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.949942Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.957712Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.957037Z&quot;}}" data-execution_count="32">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> terminated(solution, frontier_f, frontier_b, f_f, f_b):</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""TERMINATED: ya no puede aparecer una solucion mejor.</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Si los dos nodos de arriba juntos ya cuestan mas que el mejor camino</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="co">    que tenemos, cualquier camino que quede por armar va a ser peor.</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Mientras no haya solucion, PATH_COST de `failure` es infinito y esto</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="co">    nunca corta.</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> frontier_f.IS_EMPTY() <span class="kw">or</span> frontier_b.IS_EMPTY():</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> f_f(frontier_f.TOP()) <span class="op">+</span> f_b(frontier_b.TOP()) <span class="op">&gt;</span> solution.PATH_COST</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> join_nodes(<span class="bu">dir</span>, node1, node2):</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""JOIN-NODES: pega el camino de ida con el de vuelta dado vuelta.</span></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a><span class="co">    Los dos nodos estan en la misma ciudad. El de ida trae el camino</span></span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a><span class="co">    desde INITIAL; el de vuelta trae el camino hasta GOAL, pero armado</span></span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a><span class="co">    al reves, asi que hay que rehacerlo hacia adelante.</span></span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>    ida, vuelta <span class="op">=</span> (node1, node2) <span class="cf">if</span> <span class="bu">dir</span> <span class="op">==</span> <span class="st">"F"</span> <span class="cf">else</span> (node2, node1)</span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>    node <span class="op">=</span> ida</span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> vuelta.PARENT <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a>        paso <span class="op">=</span> vuelta.PATH_COST <span class="op">-</span> vuelta.PARENT.PATH_COST</span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># El camino de vuelta sabe por que ciudades pasa, pero no con</span></span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a>        <span class="co"># que accion se llega a cada una yendo para adelante.</span></span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a>        node <span class="op">=</span> Node(STATE<span class="op">=</span>vuelta.PARENT.STATE, PARENT<span class="op">=</span>node, ACTION<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a>                    PATH_COST<span class="op">=</span>node.PATH_COST <span class="op">+</span> paso)</span>
+<span id="cb44-29"><a href="#cb44-29" aria-hidden="true" tabindex="-1"></a>        vuelta <span class="op">=</span> vuelta.PARENT</span>
+<span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> node</span>
+<span id="cb44-31"><a href="#cb44-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-32"><a href="#cb44-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-33"><a href="#cb44-33" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> proceed(<span class="bu">dir</span>, problem, frontier, reached, reached2, solution, view<span class="op">=</span>silent):</span>
+<span id="cb44-34"><a href="#cb44-34" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Expande un nodo de un lado y lo compara contra el otro lado.</span></span>
+<span id="cb44-35"><a href="#cb44-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-36"><a href="#cb44-36" aria-hidden="true" tabindex="-1"></a><span class="co">    `dir` es F si el que avanza es el de ida, B si es el de vuelta.</span></span>
+<span id="cb44-37"><a href="#cb44-37" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb44-38"><a href="#cb44-38" aria-hidden="true" tabindex="-1"></a>    node <span class="op">=</span> frontier.POP()</span>
+<span id="cb44-39"><a href="#cb44-39" aria-hidden="true" tabindex="-1"></a>    view.POP(node, frontier, reached)</span>
+<span id="cb44-40"><a href="#cb44-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> child <span class="kw">in</span> expand(problem, node):</span>
+<span id="cb44-41"><a href="#cb44-41" aria-hidden="true" tabindex="-1"></a>        s <span class="op">=</span> child.STATE</span>
+<span id="cb44-42"><a href="#cb44-42" aria-hidden="true" tabindex="-1"></a>        view.CHILD(child, reached)</span>
+<span id="cb44-43"><a href="#cb44-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> s <span class="kw">not</span> <span class="kw">in</span> reached <span class="kw">or</span> child.PATH_COST <span class="op">&lt;</span> reached[s].PATH_COST:</span>
+<span id="cb44-44"><a href="#cb44-44" aria-hidden="true" tabindex="-1"></a>            reached[s] <span class="op">=</span> child</span>
+<span id="cb44-45"><a href="#cb44-45" aria-hidden="true" tabindex="-1"></a>            frontier.ADD(child)</span>
+<span id="cb44-46"><a href="#cb44-46" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> s <span class="kw">in</span> reached2:</span>
+<span id="cb44-47"><a href="#cb44-47" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Los dos lados llegaron a la misma ciudad: hay camino</span></span>
+<span id="cb44-48"><a href="#cb44-48" aria-hidden="true" tabindex="-1"></a>                <span class="co"># entero. Puede que no sea el mejor, asi que se compara.</span></span>
+<span id="cb44-49"><a href="#cb44-49" aria-hidden="true" tabindex="-1"></a>                solution2 <span class="op">=</span> join_nodes(<span class="bu">dir</span>, child, reached2[s])</span>
+<span id="cb44-50"><a href="#cb44-50" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> solution2.PATH_COST <span class="op">&lt;</span> solution.PATH_COST:</span>
+<span id="cb44-51"><a href="#cb44-51" aria-hidden="true" tabindex="-1"></a>                    solution <span class="op">=</span> solution2</span>
+<span id="cb44-52"><a href="#cb44-52" aria-hidden="true" tabindex="-1"></a>                    view.NOTE(<span class="ss">f"se cruzan en </span><span class="sc">{</span>s<span class="sc">}</span><span class="ss">: "</span></span>
+<span id="cb44-53"><a href="#cb44-53" aria-hidden="true" tabindex="-1"></a>                              <span class="ss">f"camino entero de </span><span class="sc">{</span>solution<span class="sc">.</span>PATH_COST<span class="sc">:g}</span><span class="ss">"</span>)</span>
+<span id="cb44-54"><a href="#cb44-54" aria-hidden="true" tabindex="-1"></a>    view.STEP(frontier, reached)</span>
+<span id="cb44-55"><a href="#cb44-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> solution</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Y el algoritmo. En cada vuelta avanza el lado cuyo nodo en la cola tiene el costo más bajo.</p>
-<div id="c57" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.960576Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.960233Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.966166Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.965567Z&quot;}}" data-execution_count="32">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bibf_search(problem_f, f_f, problem_b, f_b, view<span class="op">=</span>silent):</span>
-<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Best-first por los dos lados a la vez."""</span></span>
-<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    node_f <span class="op">=</span> Node(STATE<span class="op">=</span>problem_f.INITIAL)      <span class="co"># nodo del estado inicial</span></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    node_b <span class="op">=</span> Node(STATE<span class="op">=</span>problem_b.INITIAL)      <span class="co"># nodo del estado objetivo</span></span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    frontier_f <span class="op">=</span> PriorityQueue([node_f], key<span class="op">=</span>f_f)</span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    frontier_b <span class="op">=</span> PriorityQueue([node_b], key<span class="op">=</span>f_b)</span>
-<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>    reached_f <span class="op">=</span> {node_f.STATE: node_f}</span>
-<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>    reached_b <span class="op">=</span> {node_b.STATE: node_b}</span>
-<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>    solution <span class="op">=</span> failure</span>
-<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="kw">not</span> terminated(solution, frontier_f, frontier_b, f_f, f_b):</span>
-<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> f_f(frontier_f.TOP()) <span class="op">&lt;</span> f_b(frontier_b.TOP()):</span>
-<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>            view.ROUND(<span class="st">"adelante"</span>, reached_b)</span>
-<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>            solution <span class="op">=</span> proceed(<span class="st">"F"</span>, problem_f, frontier_f,</span>
-<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>                               reached_f, reached_b, solution, view)</span>
-<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>            view.ROUND(<span class="st">"atras"</span>, reached_f)</span>
-<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>            solution <span class="op">=</span> proceed(<span class="st">"B"</span>, problem_b, frontier_b,</span>
-<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>                               reached_b, reached_f, solution, view)</span>
-<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># El ultimo cuadro muestra los dos lados juntos.</span></span>
-<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>    view.ROUND(<span class="st">"los dos lados"</span>, reached_b)</span>
-<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>    view.DONE(solution, frontier_f, reached_f)</span>
-<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> solution</span>
-<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bidirectional_search(problem_f, problem_b, view<span class="op">=</span>silent):</span>
-<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Bidireccional con f(n) = g(n) de los dos lados: uniform-cost."""</span></span>
-<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> bibf_search(problem_f, g, problem_b, g, view<span class="op">=</span>view)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c57" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.960576Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.960233Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.966166Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.965567Z&quot;}}" data-execution_count="33">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bibf_search(problem_f, f_f, problem_b, f_b, view<span class="op">=</span>silent):</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Best-first por los dos lados a la vez."""</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    node_f <span class="op">=</span> Node(STATE<span class="op">=</span>problem_f.INITIAL)      <span class="co"># nodo del estado inicial</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    node_b <span class="op">=</span> Node(STATE<span class="op">=</span>problem_b.INITIAL)      <span class="co"># nodo del estado objetivo</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    frontier_f <span class="op">=</span> PriorityQueue([node_f], key<span class="op">=</span>f_f)</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    frontier_b <span class="op">=</span> PriorityQueue([node_b], key<span class="op">=</span>f_b)</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    reached_f <span class="op">=</span> {node_f.STATE: node_f}</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    reached_b <span class="op">=</span> {node_b.STATE: node_b}</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>    solution <span class="op">=</span> failure</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="kw">not</span> terminated(solution, frontier_f, frontier_b, f_f, f_b):</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> f_f(frontier_f.TOP()) <span class="op">&lt;</span> f_b(frontier_b.TOP()):</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>            view.ROUND(<span class="st">"adelante"</span>, reached_b)</span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>            solution <span class="op">=</span> proceed(<span class="st">"F"</span>, problem_f, frontier_f,</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>                               reached_f, reached_b, solution, view)</span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>            view.ROUND(<span class="st">"atras"</span>, reached_f)</span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a>            solution <span class="op">=</span> proceed(<span class="st">"B"</span>, problem_b, frontier_b,</span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>                               reached_b, reached_f, solution, view)</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># El ultimo cuadro muestra los dos lados juntos.</span></span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>    view.ROUND(<span class="st">"los dos lados"</span>, reached_b)</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>    view.DONE(solution, frontier_f, reached_f)</span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> solution</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bidirectional_search(problem_f, problem_b, view<span class="op">=</span>silent):</span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Bidireccional con f(n) = g(n) de los dos lados: uniform-cost."""</span></span>
+<span id="cb45-27"><a href="#cb45-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> bibf_search(problem_f, g, problem_b, g, view<span class="op">=</span>view)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="c58" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.968423Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.968164Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.973589Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.972755Z&quot;}}" data-execution_count="33">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>problem_b <span class="op">=</span> RouteProblem(<span class="st">"Bucharest"</span>, <span class="st">"Arad"</span>, <span class="bu">map</span><span class="op">=</span>romania)</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>bidireccional <span class="op">=</span> Web(problem, <span class="st">"BIBF-SEARCH"</span>, <span class="st">"dos frentes, f(n) = g(n)"</span>,</span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>                    key<span class="op">=</span>g, key_name<span class="op">=</span><span class="st">"g"</span>)</span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>solucion_bidireccional <span class="op">=</span> bidirectional_search(problem, problem_b, view<span class="op">=</span>bidireccional)</span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">" -&gt; "</span>.join(path_states(solucion_bidireccional)))</span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"costo:"</span>, solucion_bidireccional.PATH_COST)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c58" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.968423Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.968164Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.973589Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.972755Z&quot;}}" data-execution_count="34">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>problem_b <span class="op">=</span> RouteProblem(<span class="st">"Bucharest"</span>, <span class="st">"Arad"</span>, <span class="bu">map</span><span class="op">=</span>romania)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>bidireccional <span class="op">=</span> Web(problem, <span class="st">"BIBF-SEARCH"</span>, <span class="st">"dos frentes, f(n) = g(n)"</span>,</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>                    key<span class="op">=</span>g, key_name<span class="op">=</span><span class="st">"g"</span>)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>solucion_bidireccional <span class="op">=</span> bidirectional_search(problem, problem_b, view<span class="op">=</span>bidireccional)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">" -&gt; "</span>.join(path_states(solucion_bidireccional)))</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"costo:"</span>, solucion_bidireccional.PATH_COST)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Arad -&gt; Sibiu -&gt; Rimnicu -&gt; Pitesti -&gt; Bucharest
 costo: 418</code></pre>
 </div>
 </div>
 <p>Solución encontrada: 418 km, el óptimo, en 11 expansiones.</p>
-<div id="c60" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.975828Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.975616Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.981019Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.979929Z&quot;}}" data-execution_count="34">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>ver(bidireccional)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display column-screen-inset" data-execution_count="34">
+<div id="c60" class="cell page-columns page-full" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.975828Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.975616Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.981019Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.979929Z&quot;}}" data-execution_count="35">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>ver(bidireccional)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display column-screen-inset" data-execution_count="35">
 <div><iframe srcdoc="<title>Arad a Bucharest</title>
 <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
 <link rel=&quot;stylesheet&quot; href=&quot;https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&amp;display=swap&quot;>
@@ -5187,21 +5881,21 @@ mostrar(0);
 </tbody>
 </table>
 <p>¹ completo si <code>b</code> es finito y el espacio de estados o tiene solución o es finito. ² completo si todos los costos de acción son ≥ ε &gt; 0. ³ óptimo en costo si todos los costos de acción son iguales. ⁴ si los dos lados usan búsqueda en amplitud o costo uniforme.</p>
-<div id="c62" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.983881Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.983556Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.989223Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.988185Z&quot;}}" data-execution_count="35">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>resultados <span class="op">=</span> [</span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"búsqueda en amplitud"</span>,    solucion_amplitud,      amplitud),</span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"costo uniforme"</span>,          solucion_uniforme,      uniforme),</span>
-<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"búsqueda en profundidad"</span>, solucion_profundidad,   profundidad),</span>
-<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"profundidad iterativa"</span>,   solucion_iterativa,     iterativa),</span>
-<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"búsqueda bidireccional"</span>,  solucion_bidireccional, bidireccional),</span>
-<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'algoritmo'</span><span class="sc">:&lt;25}{</span><span class="st">'costo'</span><span class="sc">:&gt;7}{</span><span class="st">'ciudades'</span><span class="sc">:&gt;10}{</span><span class="st">'expande'</span><span class="sc">:&gt;9}</span><span class="ss">   camino"</span>)</span>
-<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">99</span>)</span>
-<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> nombre, nodo, view <span class="kw">in</span> resultados:</span>
-<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>    estados <span class="op">=</span> path_states(nodo)</span>
-<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>nombre<span class="sc">:&lt;25}{</span>nodo<span class="sc">.</span>PATH_COST<span class="sc">:&gt;7g}{</span><span class="bu">len</span>(estados)<span class="sc">:&gt;10}{</span>view<span class="sc">.</span>pops<span class="sc">:&gt;9}</span><span class="ss">   "</span></span>
-<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"</span><span class="sc">{</span><span class="st">' '</span><span class="sc">.</span>join(estados[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>])<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="c62" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;execution&quot;,&quot;value&quot;:{&quot;iopub.execute_input&quot;:&quot;2026-08-24T21:08:20.983881Z&quot;,&quot;iopub.status.busy&quot;:&quot;2026-08-24T21:08:20.983556Z&quot;,&quot;iopub.status.idle&quot;:&quot;2026-08-24T21:08:20.989223Z&quot;,&quot;shell.execute_reply&quot;:&quot;2026-08-24T21:08:20.988185Z&quot;}}" data-execution_count="36">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>resultados <span class="op">=</span> [</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"búsqueda en amplitud"</span>,    solucion_amplitud,      amplitud),</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"costo uniforme"</span>,          solucion_uniforme,      uniforme),</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"búsqueda en profundidad"</span>, solucion_profundidad,   profundidad),</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"profundidad iterativa"</span>,   solucion_iterativa,     iterativa),</span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"búsqueda bidireccional"</span>,  solucion_bidireccional, bidireccional),</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'algoritmo'</span><span class="sc">:&lt;25}{</span><span class="st">'costo'</span><span class="sc">:&gt;7}{</span><span class="st">'ciudades'</span><span class="sc">:&gt;10}{</span><span class="st">'expande'</span><span class="sc">:&gt;9}</span><span class="ss">   camino"</span>)</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"-"</span> <span class="op">*</span> <span class="dv">99</span>)</span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> nombre, nodo, view <span class="kw">in</span> resultados:</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>    estados <span class="op">=</span> path_states(nodo)</span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>nombre<span class="sc">:&lt;25}{</span>nodo<span class="sc">.</span>PATH_COST<span class="sc">:&gt;7g}{</span><span class="bu">len</span>(estados)<span class="sc">:&gt;10}{</span>view<span class="sc">.</span>pops<span class="sc">:&gt;9}</span><span class="ss">   "</span></span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a>          <span class="ss">f"</span><span class="sc">{</span><span class="st">' '</span><span class="sc">.</span>join(estados[<span class="dv">1</span>:<span class="op">-</span><span class="dv">1</span>])<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>algoritmo                  costo  ciudades  expande   camino
 ---------------------------------------------------------------------------------------------------
