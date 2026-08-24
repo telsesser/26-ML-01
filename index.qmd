@@ -1,0 +1,16 @@
+---
+title: "Búsqueda"
+---
+
+Material de clase sobre los algoritmos de búsqueda del capítulo 3 de
+Russell & Norvig, *Artificial Intelligence: A Modern Approach*, 4ª edición.
+
+Todos se corren sobre el mismo problema — ir de **Arad a Bucharest** en el mapa
+de Rumania — y se pueden recorrer paso a paso, con el mapa o con el árbol de
+búsqueda.
+
+## Clases
+
+- [Búsqueda no informada](busqueda.ipynb) — búsqueda en amplitud, costo uniforme,
+  búsqueda en profundidad, profundidad limitada, profundidad iterativa y
+  búsqueda bidireccional.

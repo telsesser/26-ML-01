@@ -1,0 +1,9 @@
+[project]
+name = "busqueda"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "ipykernel>=7.3.0",
+    "matplotlib>=3.11.1",
+    "networkx>=3.6.1",
+]

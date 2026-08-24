@@ -1,0 +1,682 @@
+<title>Arad a Bucharest</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+
+<style>
+:root {
+  --papel:  #F6F7F5;
+  --carta:  #FFFFFF;
+  --tinta:  #1A2026;
+  --tinta2: #5A646E;
+  --linea:  #DDE2DE;
+  --acento: #0F6C7E;
+  --ocre:   #9C6B14;
+  --rojo:   #A8322D;
+  --muerto: #8A9199;
+  --otro:   #6A4C93;
+  --tenue:  rgba(15, 108, 126, .09);
+  --sombra: 0 1px 2px rgba(26, 32, 38, .06), 0 8px 24px rgba(26, 32, 38, .05);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel:  #12171B;
+    --carta:  #171D22;
+    --tinta:  #E6EBE8;
+    --tinta2: #98A3AA;
+    --linea:  #293238;
+    --acento: #4FB3C4;
+    --ocre:   #D3A24A;
+    --rojo:   #E0796F;
+    --muerto: #6B757C;
+    --otro:   #B49BE0;
+    --tenue:  rgba(79, 179, 196, .12);
+    --sombra: 0 1px 2px rgba(0, 0, 0, .3);
+  }
+}
+:root[data-theme="dark"] {
+  --papel:  #12171B;
+  --carta:  #171D22;
+  --tinta:  #E6EBE8;
+  --tinta2: #98A3AA;
+  --linea:  #293238;
+  --acento: #4FB3C4;
+  --ocre:   #D3A24A;
+  --rojo:   #E0796F;
+  --muerto: #6B757C;
+  --otro:   #B49BE0;
+  --tenue:  rgba(79, 179, 196, .12);
+  --sombra: 0 1px 2px rgba(0, 0, 0, .3);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--tinta);
+  font: 400 15px/1.5 "Source Sans 3", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.num { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+/* ---------- barra ---------- */
+
+.barra {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+  padding: 18px 28px 14px;
+  border-bottom: 1px solid var(--linea);
+}
+.barra h1 {
+  margin: 0;
+  font: 600 19px/1.2 "Zilla Slab", Georgia, serif;
+  letter-spacing: .01em;
+}
+.barra .sub {
+  margin: 3px 0 0;
+  color: var(--tinta2); font-size: 13.5px;
+}
+.barra .sub b { font-family: "JetBrains Mono", monospace; font-weight: 400; color: var(--acento); }
+
+.mando { display: flex; align-items: center; gap: 10px; }
+.mando button {
+  font: 600 14px/1 "Source Sans 3", sans-serif;
+  color: var(--tinta); background: var(--carta);
+  border: 1px solid var(--linea); border-radius: 6px;
+  padding: 9px 14px; cursor: pointer;
+}
+.mando button:hover:not(:disabled) { border-color: var(--acento); color: var(--acento); }
+.mando button:disabled { opacity: .35; cursor: default; }
+.mando button:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+/* el switch mapa / arbol: dos botones pegados, uno hundido */
+.mando .vista { display: flex; border: 1px solid var(--linea); border-radius: 6px; overflow: hidden; }
+.mando .vista button {
+  font-weight: 400; font-size: 13px;
+  border: 0; border-radius: 0; padding: 9px 13px;
+  color: var(--tinta2); background: var(--carta);
+}
+.mando .vista button[aria-pressed="true"] {
+  background: var(--tenue); color: var(--acento); font-weight: 600;
+}
+.vuelta {
+  font: 600 11.5px/1 "Source Sans 3", sans-serif;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--otro); border: 1px solid var(--otro); border-radius: 999px;
+  padding: 5px 9px;
+}
+.contador { color: var(--tinta2); font-size: 13px; min-width: 96px; text-align: center; }
+.contador b { color: var(--tinta); font-weight: 600; }
+
+/* ---------- riel de pasos ---------- */
+
+.riel {
+  display: flex; align-items: center; gap: 6px;
+  padding: 12px 28px; overflow-x: auto;
+  border-bottom: 1px solid var(--linea);
+}
+.riel .et {
+  color: var(--muerto); font-size: 11px; letter-spacing: .09em;
+  text-transform: uppercase; margin-right: 6px; white-space: nowrap;
+}
+.riel button {
+  font: 400 13px/1 "Source Sans 3", sans-serif; white-space: nowrap;
+  color: var(--tinta2); background: transparent;
+  border: 1px solid var(--linea); border-radius: 999px;
+  padding: 6px 11px; cursor: pointer;
+}
+.riel button:hover { color: var(--acento); border-color: var(--acento); }
+.riel button[aria-current="true"] {
+  color: var(--papel); background: var(--acento); border-color: var(--acento);
+  font-weight: 600;
+}
+.riel button:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+/* ---------- cuerpo ---------- */
+
+main {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr);
+  gap: 22px; padding: 22px 28px 40px; align-items: start;
+}
+@media (max-width: 900px) { main { grid-template-columns: minmax(0, 1fr); } }
+
+.tarjeta {
+  background: var(--carta); border: 1px solid var(--linea);
+  border-radius: 10px; box-shadow: var(--sombra);
+}
+.mapa { padding: 8px; }
+.mapa svg { display: block; width: 100%; height: auto; }
+.mapa svg.oculto { display: none; }
+/* El arbol se dibuja a tamano real para que los nombres se lean, y la
+   caja lo deja correr: un arbol de profundidad no entra en la pantalla,
+   y eso tambien es parte de lo que hay que ver. */
+.caja-arbol { display: flex; overflow: auto; max-height: min(64vh, 580px); }
+.caja-arbol.oculto { display: none; }
+#arbol { width: auto; height: auto; margin: auto; flex: none; }
+
+.panel { display: flex; flex-direction: column; }
+.bloque { padding: 16px 18px; border-bottom: 1px solid var(--linea); }
+.bloque:last-child { border-bottom: 0; }
+.bloque > h2 {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin: 0 0 10px;
+  font: 600 11px/1 "Source Sans 3", sans-serif;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--muerto);
+}
+.bloque > h2 span { letter-spacing: 0; text-transform: none; font-weight: 400; }
+
+/* POP */
+.pop-ciudad {
+  font: 600 22px/1.1 "Zilla Slab", Georgia, serif; color: var(--acento);
+}
+.pop-datos { margin-top: 6px; display: flex; gap: 16px; font-size: 13.5px; color: var(--tinta2); }
+.pop-datos b { color: var(--tinta); font-weight: 600; }
+.camino { margin-top: 10px; font-size: 13px; color: var(--tinta2); word-break: break-word; }
+
+/* EXPAND */
+.hijo {
+  display: grid; grid-template-columns: 14px 1fr auto auto; gap: 4px 10px;
+  align-items: baseline; padding: 5px 0 5px 8px;
+  border-left: 2px solid transparent; font-size: 14px;
+}
+.hijo .sig { font-weight: 600; }
+.hijo .nota { grid-column: 2 / -1; font-size: 12.5px; color: var(--muerto); }
+.hijo.nuevo      { border-left-color: var(--acento); }
+.hijo.nuevo .sig { color: var(--acento); }
+.hijo.mejora     { border-left-color: var(--acento); background: var(--tenue); }
+.hijo.mejora .sig, .hijo.mejora .nota, .hijo.mejora .ciudad { color: var(--acento); font-weight: 600; }
+.hijo.descartado { border-left-color: var(--rojo); }
+.hijo.descartado .sig { color: var(--rojo); }
+.hijo.descartado .ciudad, .hijo.descartado .val { color: var(--tinta2); }
+.hijo .val { font-size: 13px; color: var(--tinta2); }
+
+/* FRONTIER */
+.cola { display: flex; flex-direction: column; }
+.fila {
+  display: grid; grid-template-columns: 12px 1fr auto; gap: 10px;
+  align-items: baseline; padding: 4px 0; font-size: 14px;
+  border-bottom: 1px dotted var(--linea);
+}
+.fila:last-child { border-bottom: 0; }
+.fila .pico { color: var(--ocre); font-weight: 600; }
+.fila.top .ciudad { font-weight: 600; color: var(--ocre); }
+.fila.top .val { color: var(--ocre); font-weight: 600; }
+.fila .val { font-size: 13px; }
+.fila.stale .ciudad, .fila.stale .val { color: var(--muerto); text-decoration: line-through; }
+.tag {
+  font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--rojo); border: 1px solid var(--rojo); border-radius: 3px;
+  padding: 0 4px; margin-left: 6px; text-decoration: none; display: inline-block;
+  vertical-align: 1px;
+}
+
+/* REACHED */
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+  font-size: 12.5px; color: var(--tinta2);
+  border: 1px solid var(--linea); border-radius: 4px; padding: 2px 7px;
+}
+.chip b { color: var(--tinta); font-weight: 600; }
+.chip.otro { color: var(--otro); border-color: var(--otro); }
+
+/* DONE */
+.done { padding: 16px 18px; border-top: 1px solid var(--linea); }
+.done.goal { background: var(--tenue); }
+.done h3 {
+  margin: 0 0 6px;
+  font: 600 12px/1 "Source Sans 3", sans-serif;
+  letter-spacing: .12em; text-transform: uppercase; color: var(--acento);
+}
+.done.fail h3 { color: var(--rojo); }
+.done p { margin: 0; font-size: 14px; }
+.done .ruta { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--tinta); }
+.done .costo { margin-top: 6px; color: var(--tinta2); font-size: 13.5px; }
+.nota-paso {
+  margin: 4px 0 0; padding-left: 10px; font-size: 13.5px; color: var(--rojo);
+  border-left: 2px solid var(--rojo);
+}
+.oculto { display: none; }
+
+/* ---------- mapa ---------- */
+
+.e { stroke: var(--linea); stroke-width: 1.6; }
+.e.path { stroke: var(--acento); stroke-width: 3.2; }
+.e.sol  { stroke: var(--acento); stroke-width: 4.4; }
+.km {
+  font-family: "JetBrains Mono", monospace; font-size: 9px; fill: var(--muerto);
+  text-anchor: middle; paint-order: stroke; stroke: var(--carta); stroke-width: 3.5;
+}
+.n circle { fill: var(--carta); stroke: var(--linea); stroke-width: 1.8; transition: none; }
+.n text {
+  font: 600 11.5px "Source Sans 3", sans-serif; fill: var(--muerto);
+  text-anchor: middle; paint-order: stroke; stroke: var(--carta); stroke-width: 3.5;
+}
+.n.reached circle { fill: var(--acento); stroke: var(--acento); fill-opacity: .3; }
+.n.reached text   { fill: var(--tinta2); }
+.n.frontier circle { fill: var(--carta); stroke: var(--ocre); stroke-width: 2.6; }
+.n.frontier text   { fill: var(--ocre); }
+.n.pop circle { fill: var(--acento); stroke: var(--acento); fill-opacity: 1; }
+.n.pop text   { fill: var(--acento); font-size: 13px; }
+.n .halo { fill: none; stroke: var(--acento); stroke-width: 1.4; opacity: 0; }
+.n.pop .halo { opacity: .45; }
+.n.goal circle { stroke-dasharray: 3 2.5; }
+/* El otro lado de la busqueda bidireccional: un anillo, sobre lo que ya haya. */
+.n.otro circle:not(.halo) { stroke: var(--otro); stroke-width: 2.8; }
+.n.otro:not(.reached):not(.frontier):not(.pop) text { fill: var(--otro); }
+
+/* ---------- arbol de busqueda ---------- */
+
+.rama { stroke: var(--linea); stroke-width: 1.6; }
+.rama.sol { stroke: var(--acento); stroke-width: 3.2; }
+/* Un hijo que se genero y no llego a entrar a la frontera. */
+.n.descartado circle { fill: var(--carta); stroke: var(--muerto); stroke-dasharray: 2.5 2.5; }
+.n.descartado text { fill: var(--muerto); }
+.n text.g { font: 400 9.5px "JetBrains Mono", monospace; fill: var(--muerto); }
+</style>
+
+<header class="barra">
+  <div>
+    <h1 id="nombre"></h1>
+    <p class="sub"><b id="label"></b> &middot; <span id="ruta-titulo"></span></p>
+  </div>
+  <div class="mando">
+    <span class="vista">
+      <button id="v-mapa" aria-pressed="true">mapa</button>
+      <button id="v-arbol" aria-pressed="false">&aacute;rbol</button>
+    </span>
+    <span class="vuelta oculto" id="vuelta"></span>
+    <button id="prev" aria-label="paso anterior">&larr;</button>
+    <span class="contador">paso <b id="i">1</b> / <span id="n">1</span></span>
+    <button id="next" aria-label="paso siguiente">&rarr;</button>
+  </div>
+</header>
+
+<nav class="riel" id="riel"><span class="et">expandidos</span></nav>
+
+<main>
+  <section class="tarjeta mapa">
+    <svg id="svg" role="img" aria-label="mapa de Rumania"></svg>
+    <div class="caja-arbol oculto" id="caja-arbol">
+      <svg id="arbol" role="img" aria-label="arbol de busqueda"></svg>
+    </div>
+  </section>
+
+  <section class="tarjeta panel">
+    <div class="bloque">
+      <h2>POP</h2>
+      <div class="pop-ciudad" id="pop-ciudad"></div>
+      <div class="pop-datos num" id="pop-datos"></div>
+      <div class="camino" id="pop-camino"></div>
+    </div>
+
+    <div class="bloque" id="caja-expand">
+      <h2>EXPAND <span id="expand-n"></span></h2>
+      <div id="expand"></div>
+      <p class="nota-paso oculto" id="nota"></p>
+    </div>
+
+    <div class="bloque">
+      <h2>FRONTIER <span id="frontier-n"></span></h2>
+      <div class="cola" id="frontier"></div>
+    </div>
+
+    <div class="bloque" id="caja-reached">
+      <h2>REACHED <span id="reached-n"></span></h2>
+      <div class="chips" id="reached"></div>
+    </div>
+
+    <div class="bloque oculto" id="caja-otros">
+      <h2>REACHED del otro lado <span id="otros-n"></span></h2>
+      <div class="chips" id="otros"></div>
+    </div>
+
+    <div class="done oculto" id="done"></div>
+  </section>
+</main>
+
+<script>
+const DATA = {"name": "DEPTH-LIMITED-SEARCH", "label": "pila LIFO, l = 1", "keyName": "prof", "initial": "Arad", "goal": "Bucharest", "cities": {"Arad": [91, 349], "Bucharest": [400, 514], "Craiova": [253, 553], "Drobeta": [165, 542], "Eforie": [562, 548], "Fagaras": [305, 392], "Giurgiu": [375, 571], "Hirsova": [534, 491], "Iasi": [473, 335], "Lugoj": [165, 462], "Mehadia": [168, 502], "Neamt": [406, 304], "Oradea": [131, 270], "Pitesti": [320, 473], "Rimnicu": [233, 431], "Sibiu": [207, 384], "Timisoara": [94, 431], "Urziceni": [456, 491], "Vaslui": [509, 397], "Zerind": [108, 310]}, "links": [["Arad", "Sibiu", 140], ["Arad", "Timisoara", 118], ["Arad", "Zerind", 75], ["Bucharest", "Fagaras", 211], ["Bucharest", "Giurgiu", 90], ["Bucharest", "Pitesti", 101], ["Bucharest", "Urziceni", 85], ["Craiova", "Drobeta", 120], ["Craiova", "Pitesti", 138], ["Craiova", "Rimnicu", 146], ["Drobeta", "Mehadia", 75], ["Eforie", "Hirsova", 86], ["Fagaras", "Sibiu", 99], ["Hirsova", "Urziceni", 98], ["Iasi", "Neamt", 87], ["Iasi", "Vaslui", 92], ["Lugoj", "Mehadia", 70], ["Lugoj", "Timisoara", 111], ["Oradea", "Sibiu", 151], ["Oradea", "Zerind", 71], ["Pitesti", "Rimnicu", 97], ["Rimnicu", "Sibiu", 80], ["Urziceni", "Vaslui", 142]], "h": {"Arad": 366, "Bucharest": 0, "Craiova": 160, "Drobeta": 242, "Eforie": 161, "Fagaras": 176, "Giurgiu": 77, "Hirsova": 151, "Iasi": 226, "Lugoj": 244, "Mehadia": 241, "Neamt": 234, "Oradea": 380, "Pitesti": 100, "Rimnicu": 193, "Sibiu": 253, "Timisoara": 329, "Urziceni": 80, "Vaslui": 199, "Zerind": 374}, "viewBox": "45 224 563 393", "frames": [{"step": 1, "round": null, "otros": null, "pop": {"state": "Arad", "g": 0, "key": 0, "id": 1, "parent": null, "depth": 0, "path": ["Arad"]}, "children": [{"state": "Sibiu", "g": 140, "key": 1, "id": 0, "parent": 1, "depth": 1, "kind": "nuevo", "nota": ""}, {"state": "Timisoara", "g": 118, "key": 1, "id": 2, "parent": 1, "depth": 1, "kind": "nuevo", "nota": ""}, {"state": "Zerind", "g": 75, "key": 1, "id": 3, "parent": 1, "depth": 1, "kind": "nuevo", "nota": ""}], "note": null, "frontier": [{"state": "Zerind", "key": 1, "stale": false}, {"state": "Timisoara", "key": 1, "stale": false}, {"state": "Sibiu", "key": 1, "stale": false}], "reached": null, "done": null}, {"step": 2, "round": null, "otros": null, "pop": {"state": "Zerind", "g": 75, "key": 1, "id": 3, "parent": 1, "depth": 1, "path": ["Arad", "Zerind"]}, "children": [{"state": "Arad", "g": 150, "key": 2, "id": 4, "parent": 3, "depth": 2, "kind": "nuevo", "nota": ""}, {"state": "Oradea", "g": 146, "key": 2, "id": 5, "parent": 3, "depth": 2, "kind": "nuevo", "nota": ""}], "note": null, "frontier": [{"state": "Oradea", "key": 2, "stale": false}, {"state": "Arad", "key": 2, "stale": false}, {"state": "Timisoara", "key": 1, "stale": false}, {"state": "Sibiu", "key": 1, "stale": false}], "reached": null, "done": null}, {"step": 3, "round": null, "otros": null, "pop": {"state": "Oradea", "g": 146, "key": 2, "id": 5, "parent": 3, "depth": 2, "path": ["Arad", "Zerind", "Oradea"]}, "children": [], "note": "pasa el limite l = 1: no se expande", "frontier": [{"state": "Arad", "key": 2, "stale": false}, {"state": "Timisoara", "key": 1, "stale": false}, {"state": "Sibiu", "key": 1, "stale": false}], "reached": null, "done": null}, {"step": 4, "round": null, "otros": null, "pop": {"state": "Arad", "g": 150, "key": 2, "id": 4, "parent": 3, "depth": 2, "path": ["Arad", "Zerind", "Arad"]}, "children": [], "note": "pasa el limite l = 1: no se expande", "frontier": [{"state": "Timisoara", "key": 1, "stale": false}, {"state": "Sibiu", "key": 1, "stale": false}], "reached": null, "done": null}, {"step": 5, "round": null, "otros": null, "pop": {"state": "Timisoara", "g": 118, "key": 1, "id": 2, "parent": 1, "depth": 1, "path": ["Arad", "Timisoara"]}, "children": [{"state": "Arad", "g": 236, "key": 2, "id": 6, "parent": 2, "depth": 2, "kind": "nuevo", "nota": ""}, {"state": "Lugoj", "g": 229, "key": 2, "id": 7, "parent": 2, "depth": 2, "kind": "nuevo", "nota": ""}], "note": null, "frontier": [{"state": "Lugoj", "key": 2, "stale": false}, {"state": "Arad", "key": 2, "stale": false}, {"state": "Sibiu", "key": 1, "stale": false}], "reached": null, "done": null}, {"step": 6, "round": null, "otros": null, "pop": {"state": "Lugoj", "g": 229, "key": 2, "id": 7, "parent": 2, "depth": 2, "path": ["Arad", "Timisoara", "Lugoj"]}, "children": [], "note": "pasa el limite l = 1: no se expande", "frontier": [{"state": "Arad", "key": 2, "stale": false}, {"state": "Sibiu", "key": 1, "stale": false}], "reached": null, "done": null}, {"step": 7, "round": null, "otros": null, "pop": {"state": "Arad", "g": 236, "key": 2, "id": 6, "parent": 2, "depth": 2, "path": ["Arad", "Timisoara", "Arad"]}, "children": [], "note": "pasa el limite l = 1: no se expande", "frontier": [{"state": "Sibiu", "key": 1, "stale": false}], "reached": null, "done": null}, {"step": 8, "round": null, "otros": null, "pop": {"state": "Sibiu", "g": 140, "key": 1, "id": 0, "parent": 1, "depth": 1, "path": ["Arad", "Sibiu"]}, "children": [{"state": "Arad", "g": 280, "key": 2, "id": 8, "parent": 0, "depth": 2, "kind": "nuevo", "nota": ""}, {"state": "Fagaras", "g": 239, "key": 2, "id": 9, "parent": 0, "depth": 2, "kind": "nuevo", "nota": ""}, {"state": "Oradea", "g": 291, "key": 2, "id": 10, "parent": 0, "depth": 2, "kind": "nuevo", "nota": ""}, {"state": "Rimnicu", "g": 220, "key": 2, "id": 11, "parent": 0, "depth": 2, "kind": "nuevo", "nota": ""}], "note": null, "frontier": [{"state": "Rimnicu", "key": 2, "stale": false}, {"state": "Oradea", "key": 2, "stale": false}, {"state": "Fagaras", "key": 2, "stale": false}, {"state": "Arad", "key": 2, "stale": false}], "reached": null, "done": null}, {"step": 9, "round": null, "otros": null, "pop": {"state": "Rimnicu", "g": 220, "key": 2, "id": 11, "parent": 0, "depth": 2, "path": ["Arad", "Sibiu", "Rimnicu"]}, "children": [], "note": "pasa el limite l = 1: no se expande", "frontier": [{"state": "Oradea", "key": 2, "stale": false}, {"state": "Fagaras", "key": 2, "stale": false}, {"state": "Arad", "key": 2, "stale": false}], "reached": null, "done": null}, {"step": 10, "round": null, "otros": null, "pop": {"state": "Oradea", "g": 291, "key": 2, "id": 10, "parent": 0, "depth": 2, "path": ["Arad", "Sibiu", "Oradea"]}, "children": [], "note": "pasa el limite l = 1: no se expande", "frontier": [{"state": "Fagaras", "key": 2, "stale": false}, {"state": "Arad", "key": 2, "stale": false}], "reached": null, "done": null}, {"step": 11, "round": null, "otros": null, "pop": {"state": "Fagaras", "g": 239, "key": 2, "id": 9, "parent": 0, "depth": 2, "path": ["Arad", "Sibiu", "Fagaras"]}, "children": [], "note": "pasa el limite l = 1: no se expande", "frontier": [{"state": "Arad", "key": 2, "stale": false}], "reached": null, "done": null}, {"step": 12, "round": null, "otros": null, "pop": {"state": "Arad", "g": 280, "key": 2, "id": 8, "parent": 0, "depth": 2, "path": ["Arad", "Sibiu", "Arad"]}, "children": [], "note": "pasa el limite l = 1: no se expande", "frontier": [], "reached": null, "done": null}, {"step": 13, "round": null, "otros": null, "pop": {"state": "Arad", "g": 280, "key": 2, "id": 8, "parent": 0, "depth": 2, "path": ["Arad", "Sibiu", "Arad"]}, "children": [], "note": "pasa el limite l = 1: no se expande", "frontier": [], "reached": null, "done": {"kind": "cutoff"}}]};
+const SVGNS = "http://www.w3.org/2000/svg";
+const el = (id) => document.getElementById(id);
+const num = (v) => Number.isInteger(v) ? String(v) : String(Math.round(v * 100) / 100);
+// Cuando la frontera se ordena por g no hace falta mostrar la columna dos veces.
+const soloG = DATA.keyName === "g";
+
+/* ---------- el mapa se dibuja una sola vez ---------- */
+
+const svg = el("svg");
+svg.setAttribute("viewBox", DATA.viewBox);
+const aristas = {}, nodos = {};
+
+for (const [a, b, km] of DATA.links) {
+  const [ax, ay] = DATA.cities[a], [bx, by] = DATA.cities[b];
+  const linea = document.createElementNS(SVGNS, "line");
+  linea.setAttribute("class", "e");
+  linea.setAttribute("x1", ax); linea.setAttribute("y1", ay);
+  linea.setAttribute("x2", bx); linea.setAttribute("y2", by);
+  svg.appendChild(linea);
+  aristas[a + "|" + b] = aristas[b + "|" + a] = linea;
+}
+for (const [a, b, km] of DATA.links) {
+  const [ax, ay] = DATA.cities[a], [bx, by] = DATA.cities[b];
+  const t = document.createElementNS(SVGNS, "text");
+  t.setAttribute("class", "km");
+  t.setAttribute("x", (ax + bx) / 2); t.setAttribute("y", (ay + by) / 2 + 3);
+  t.textContent = km;
+  svg.appendChild(t);
+}
+for (const ciudad of Object.keys(DATA.cities)) {
+  const [x, y] = DATA.cities[ciudad];
+  const grupo = document.createElementNS(SVGNS, "g");
+  grupo.setAttribute("class", "n");
+  const halo = document.createElementNS(SVGNS, "circle");
+  halo.setAttribute("class", "halo");
+  halo.setAttribute("cx", x); halo.setAttribute("cy", y); halo.setAttribute("r", 14);
+  const c = document.createElementNS(SVGNS, "circle");
+  c.setAttribute("cx", x); c.setAttribute("cy", y); c.setAttribute("r", 6.5);
+  const t = document.createElementNS(SVGNS, "text");
+  t.setAttribute("x", x); t.setAttribute("y", y - 12);
+  t.textContent = ciudad;
+  const titulo = document.createElementNS(SVGNS, "title");
+  titulo.textContent = ciudad + " — h = " + (DATA.h[ciudad] ?? "?");
+  grupo.append(halo, c, t, titulo);
+  svg.appendChild(grupo);
+  nodos[ciudad] = grupo;
+}
+
+/* ---------- el riel de pasos ---------- */
+
+let vueltaPrevia = null;
+DATA.frames.forEach((f, i) => {
+  // Cuando el algoritmo da vueltas (profundidad iterativa, bidireccional)
+  // el riel las separa con su etiqueta.
+  if (f.round && f.round !== vueltaPrevia) {
+    const et = document.createElement("span");
+    et.className = "et";
+    et.textContent = f.round;
+    el("riel").appendChild(et);
+    vueltaPrevia = f.round;
+  }
+  const b = document.createElement("button");
+  b.textContent = f.pop.state;
+  b.onclick = () => mostrar(i);
+  el("riel").appendChild(b);
+});
+
+/* ---------- dibujar un cuadro ---------- */
+
+let actual = 0;
+
+function mostrar(i) {
+  actual = Math.max(0, Math.min(i, DATA.frames.length - 1));
+  const f = DATA.frames[actual];
+
+  el("i").textContent = actual + 1;
+  el("prev").disabled = actual === 0;
+  el("next").disabled = actual === DATA.frames.length - 1;
+  [...el("riel").querySelectorAll("button")].forEach((b, j) =>
+    b.setAttribute("aria-current", j === actual));
+
+  /* POP */
+  el("pop-ciudad").textContent = f.pop.state;
+  el("pop-datos").innerHTML = "g <b>" + num(f.pop.g) + "</b>" +
+    (soloG ? "" : "  " + DATA.keyName + " <b>" + num(f.pop.key) + "</b>");
+  el("pop-camino").textContent = f.pop.path.join("  →  ");
+  el("vuelta").classList.toggle("oculto", !f.round);
+  el("vuelta").textContent = f.round || "";
+
+  /* EXPAND */
+  el("caja-expand").classList.toggle("oculto", f.children.length === 0 && !f.note);
+  el("nota").classList.toggle("oculto", !f.note);
+  el("nota").textContent = f.note || "";
+  el("expand-n").textContent = f.children.length;
+  el("expand").innerHTML = f.children.map(ch => {
+    const sig = ch.kind === "nuevo" ? "+" : ch.kind === "mejora" ? "↑" : "−";
+    return '<div class="hijo ' + ch.kind + '">' +
+      '<span class="sig">' + sig + '</span>' +
+      '<span class="ciudad">' + ch.state + '</span>' +
+      '<span class="val num">g ' + num(ch.g) + '</span>' +
+      '<span class="val num">' + (soloG ? "" : DATA.keyName + " " + num(ch.key)) + '</span>' +
+      '<span class="nota">' + ch.nota + '</span></div>';
+  }).join("");
+
+  /* FRONTIER */
+  el("frontier-n").textContent = f.frontier.length;
+  el("frontier").innerHTML = f.frontier.map((q, j) =>
+    '<div class="fila ' + (j === 0 ? "top " : "") + (q.stale ? "stale" : "") + '">' +
+    '<span class="pico">' + (j === 0 ? "▸" : "") + '</span>' +
+    '<span class="ciudad">' + q.state + (q.stale ? '<span class="tag">obsoleto</span>' : "") + '</span>' +
+    '<span class="val num">' + num(q.key) + '</span></div>').join("");
+
+  /* REACHED */
+  el("caja-reached").classList.toggle("oculto", f.reached === null);
+  if (f.reached) {
+    const conG = f.reached[0][1] !== null;
+    el("reached-n").textContent = f.reached.length;
+    el("reached").innerHTML = f.reached.map(([c, g]) =>
+      '<span class="chip">' + c + (conG ? ' <b class="num">' + num(g) + "</b>" : "") +
+      "</span>").join("");
+  }
+
+  /* REACHED del otro lado (solo bidireccional) */
+  el("caja-otros").classList.toggle("oculto", !f.otros);
+  if (f.otros) {
+    el("otros-n").textContent = f.otros.length;
+    el("otros").innerHTML = f.otros.map(c =>
+      '<span class="chip otro">' + c + "</span>").join("");
+  }
+
+  /* DONE */
+  const done = el("done");
+  done.className = "done " + (f.done ? (f.done.kind === "goal" ? "goal" : "fail") : "oculto");
+  if (f.done && f.done.kind === "goal") {
+    done.innerHTML = "<h3>IS_GOAL → solucion</h3>" +
+      '<p class="ruta">' + f.done.path.join("  →  ") + "</p>" +
+      '<p class="costo">costo <b class="num">' + num(f.done.cost) + "</b></p>";
+  } else if (f.done) {
+    const esCutoff = f.done.kind === "cutoff";
+    done.innerHTML = "<h3>" + (esCutoff ? "cutoff" : "failure") + "</h3><p>" +
+      (esCutoff ? "no hay solucion dentro del limite: puede haber mas abajo"
+                : "la frontera quedo vacia: no hay solucion") + "</p>";
+  }
+
+  if (vista === "mapa") pintarMapa(f); else pintarArbol(actual);
+}
+
+function pintarMapa(f) {
+  const enFrontera = new Set(f.frontier.filter(q => !q.stale).map(q => q.state));
+  const alcanzado = new Set((f.reached || []).map(r => r[0]));
+  // Sin reached (depth-first) marcamos las ciudades del camino actual.
+  if (!f.reached) f.pop.path.forEach(c => alcanzado.add(c));
+
+  const otros = new Set(f.otros || []);
+
+  for (const ciudad in nodos) {
+    const clases = ["n"];
+    if (ciudad === DATA.goal) clases.push("goal");
+    if (ciudad === f.pop.state) clases.push("pop");
+    else if (enFrontera.has(ciudad)) clases.push("frontier");
+    else if (alcanzado.has(ciudad)) clases.push("reached");
+    if (otros.has(ciudad)) clases.push("otro");
+    nodos[ciudad].setAttribute("class", clases.join(" "));
+    const esPop = ciudad === f.pop.state;
+    nodos[ciudad].querySelector("circle:not(.halo)").setAttribute("r", esPop ? 8.5 : 6.5);
+    // La etiqueta sube un poco para no chocar con el halo del nodo actual.
+    nodos[ciudad].querySelector("text").setAttribute("y", DATA.cities[ciudad][1] - (esPop ? 19 : 12));
+  }
+
+  const camino = (f.done && f.done.kind === "goal") ? f.done.path : f.pop.path;
+  const clase = (f.done && f.done.kind === "goal") ? "e sol" : "e path";
+  for (const k in aristas) aristas[k].setAttribute("class", "e");
+  for (let j = 0; j < camino.length - 1; j++) {
+    const linea = aristas[camino[j] + "|" + camino[j + 1]];
+    if (linea) linea.setAttribute("class", clase);
+  }
+}
+
+/* ---------- el arbol de busqueda ---------- */
+
+/* El mapa tiene un circulo por ciudad; el arbol tiene uno por camino que
+   llega a esa ciudad. Esa es toda la diferencia entre el espacio de estados
+   y el arbol de busqueda, y es la que no se puede dibujar sobre el mapa. */
+
+const svgArbol = el("arbol");
+const PASO_X = 78, PASO_Y = 64;
+
+function armarArbol(hasta) {
+  // Se rearma de cero en cada cuadro: al riel se le puede saltar a
+  // cualquier paso, asi que no sirve ir acumulando.
+  let nodos = new Map(), raices = [];
+  let expandidos = new Set(), descartados = new Set();
+  const meter = (d) => { if (!nodos.has(d.id)) nodos.set(d.id, {...d, hijos: []}); };
+
+  for (let k = 0; k <= hasta; k++) {
+    const f = DATA.frames[k];
+    if (f.pop.parent === null && !nodos.has(f.pop.id)) {
+      // Una raiz nueva con la misma ciudad que otra raiz es una vuelta
+      // nueva: profundidad iterativa tira el arbol y lo rehace. Con otra
+      // ciudad es el otro lado, y ahi son dos arboles a la vez.
+      if (raices.some(r => nodos.get(r).state === f.pop.state)) {
+        nodos = new Map(); raices = [];
+        expandidos = new Set(); descartados = new Set();
+      }
+      raices.push(f.pop.id);
+    }
+    meter(f.pop);
+    if (k < hasta) expandidos.add(f.pop.id);
+    for (const ch of f.children) {
+      meter(ch);
+      if (ch.kind === "descartado") descartados.add(ch.id);
+    }
+  }
+  for (const n of nodos.values()) {
+    const padre = nodos.get(n.parent);
+    if (padre) padre.hijos.push(n.id);
+  }
+  return { nodos, raices, expandidos, descartados };
+}
+
+function acomodar(nodos, raices) {
+  // Cada hoja ocupa una columna; cada padre se centra sobre sus hijos.
+  let columna = 0;
+  const ubicar = (id) => {
+    const n = nodos.get(id);
+    if (n.hijos.length === 0) {
+      n.x = columna++ * PASO_X;
+    } else {
+      n.hijos.forEach(ubicar);
+      const xs = n.hijos.map(h => nodos.get(h).x);
+      n.x = (xs[0] + xs[xs.length - 1]) / 2;
+    }
+    n.y = n.depth * PASO_Y;
+  };
+  raices.forEach(r => { ubicar(r); columna += 1; });
+}
+
+function pintarArbol(i) {
+  const f = DATA.frames[i];
+  const { nodos, raices, expandidos, descartados } = armarArbol(i);
+  acomodar(nodos, raices);
+
+  const xs = [...nodos.values()].map(n => n.x);
+  const ys = [...nodos.values()].map(n => n.y);
+  const borde = 46;
+  const ancho = Math.max(...xs) - Math.min(...xs) + 2 * borde;
+  const alto = Math.max(...ys) + 2 * borde;
+  svgArbol.setAttribute("viewBox",
+    (Math.min(...xs) - borde) + " " + (-borde) + " " + ancho + " " + alto);
+  // Un punto del dibujo es un pixel: los nombres se leen siempre igual.
+  svgArbol.setAttribute("width", ancho);
+  svgArbol.setAttribute("height", alto);
+  svgArbol.textContent = "";
+
+  // El camino del nodo actual hasta la raiz, marcado como en el mapa.
+  let punta = f.pop.id;
+  if (f.done && f.done.kind === "goal") {
+    for (const n of nodos.values()) {
+      if (n.state === DATA.goal && n.g === f.done.cost) punta = n.id;
+    }
+  }
+  const camino = new Set();
+  for (let id = punta; nodos.has(id); id = nodos.get(id).parent) camino.add(id);
+
+  // primero las ramas, para que queden abajo de los nodos
+  for (const n of nodos.values()) {
+    const padre = nodos.get(n.parent);
+    if (!padre) continue;
+    const linea = document.createElementNS(SVGNS, "line");
+    linea.setAttribute("class", camino.has(n.id) ? "rama sol" : "rama");
+    linea.setAttribute("x1", padre.x); linea.setAttribute("y1", padre.y);
+    linea.setAttribute("x2", n.x); linea.setAttribute("y2", n.y);
+    svgArbol.appendChild(linea);
+  }
+
+  for (const n of nodos.values()) {
+    // Generado y todavia sin expandir es, en estos algoritmos, estar en la
+    // frontera: todo hijo que no se descarta entra a la cola.
+    const estado = n.id === f.pop.id ? "pop"
+                 : expandidos.has(n.id) ? "reached"
+                 : descartados.has(n.id) ? "descartado"
+                 : "frontier";
+    const clases = ["n", estado];
+    if (n.state === DATA.goal) clases.push("goal");
+    const esPop = estado === "pop";
+
+    const grupo = document.createElementNS(SVGNS, "g");
+    grupo.setAttribute("class", clases.join(" "));
+    const halo = document.createElementNS(SVGNS, "circle");
+    halo.setAttribute("class", "halo");
+    halo.setAttribute("cx", n.x); halo.setAttribute("cy", n.y); halo.setAttribute("r", 14);
+    const c = document.createElementNS(SVGNS, "circle");
+    c.setAttribute("cx", n.x); c.setAttribute("cy", n.y);
+    c.setAttribute("r", esPop ? 8.5 : 6.5);
+    const t = document.createElementNS(SVGNS, "text");
+    t.setAttribute("x", n.x); t.setAttribute("y", n.y - (esPop ? 19 : 13));
+    t.textContent = n.state;
+    const g = document.createElementNS(SVGNS, "text");
+    g.setAttribute("class", "g");
+    g.setAttribute("x", n.x); g.setAttribute("y", n.y + 19);
+    g.textContent = num(n.g);
+    grupo.append(halo, c, t, g);
+    svgArbol.appendChild(grupo);
+  }
+
+  // La caja sigue al nodo que se esta expandiendo: en un arbol grande, si
+  // no, la busqueda se va de pantalla y hay que ir a buscarla a mano.
+  const caja = el("caja-arbol"), aca = nodos.get(f.pop.id);
+  if (aca) {
+    caja.scrollLeft = aca.x - Math.min(...xs) + borde - caja.clientWidth / 2;
+    caja.scrollTop = aca.y + borde - caja.clientHeight / 2;
+  }
+}
+
+/* ---------- controles ---------- */
+
+let vista = "mapa";
+
+function cambiarVista(v) {
+  vista = v;
+  el("v-mapa").setAttribute("aria-pressed", v === "mapa");
+  el("v-arbol").setAttribute("aria-pressed", v === "arbol");
+  el("svg").classList.toggle("oculto", v !== "mapa");
+  el("caja-arbol").classList.toggle("oculto", v !== "arbol");
+  mostrar(actual);
+}
+el("v-mapa").onclick = () => cambiarVista("mapa");
+el("v-arbol").onclick = () => cambiarVista("arbol");
+
+el("nombre").textContent = DATA.name;
+el("label").textContent = DATA.label;
+el("ruta-titulo").textContent = DATA.initial + " → " + DATA.goal;
+el("n").textContent = DATA.frames.length;
+el("prev").onclick = () => mostrar(actual - 1);
+el("next").onclick = () => mostrar(actual + 1);
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "ArrowRight" || ev.key === " ") { mostrar(actual + 1); ev.preventDefault(); }
+  if (ev.key === "ArrowLeft") { mostrar(actual - 1); ev.preventDefault(); }
+  if (ev.key === "Home") mostrar(0);
+  if (ev.key === "End") mostrar(DATA.frames.length - 1);
+});
+
+mostrar(0);
+</script>

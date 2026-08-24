@@ -1,0 +1,34 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - busqueda.ipynb
+
+# El notebook ya trae las salidas guardadas -- las paginas paso a paso pesan
+# 300 KB y estan adentro del .ipynb. Quarto no re-ejecuta notebooks por
+# defecto; esto lo deja explicito, asi tampoco lo intenta en una maquina que
+# no tenga el entorno de Python armado.
+execute:
+  enabled: false
+
+lang: es
+
+website:
+  title: "Búsqueda"
+  page-navigation: true
+  navbar:
+    left:
+      - href: index.qmd
+        text: Inicio
+      - href: busqueda.ipynb
+        text: "Búsqueda no informada"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 3
+    toc-title: "En esta página"
+    code-copy: true
+    code-overflow: wrap
