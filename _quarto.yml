@@ -2,7 +2,6 @@ project:
   type: website
   output-dir: _site
   render:
-    - index.qmd
     - busqueda.ipynb
 
 # El notebook ya trae las salidas guardadas -- las paginas paso a paso pesan
@@ -17,15 +16,11 @@ lang: es
 website:
   title: "Búsqueda"
   page-navigation: true
-  navbar:
-    left:
-      - href: index.qmd
-        text: Inicio
-      - href: busqueda.ipynb
-        text: "Búsqueda no informada"
 
 format:
   html:
+    # La unica pagina del sitio es la portada: sin esto la raiz da 404.
+    output-file: index.html
     theme: cosmo
     toc: true
     toc-depth: 3

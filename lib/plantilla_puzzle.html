@@ -1,0 +1,743 @@
+<title>8-puzzle</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap">
+
+<style>
+/* Los colores, la barra y las tarjetas son los mismos de plantilla.html.
+   Lo que cambia de una plantilla a la otra es una sola cosa: alla un estado
+   es el nombre de una ciudad y aca es un tablero de 3x3.
+
+   Las dos vistas son las mismas dos de siempre. La generica: alla el mapa
+   entero con la ciudad actual marcada, aca el tablero actual y los tableros
+   a los que puede ir -- las dos muestran el estado y sus vecinos, sin
+   historia. Y el arbol de busqueda, que es igual en las dos. */
+
+/* ---------------------------------------------------------------------
+   La paleta y las dos familias de letra son las de Quarto: cada valor de
+   aca esta copiado del CSS que el sitio ya carga -- bootstrap cosmo y el
+   resaltado de sintaxis. La idea es que el panel se lea como una celda
+   de codigo mas de la pagina, y que un color signifique adentro del
+   panel lo mismo que significa en el codigo de arriba.
+
+   Un solo tema, y claro. El sitio es `theme: cosmo`, que no tiene modo
+   oscuro. Si el panel siguiera al sistema operativo, en una maquina
+   puesta en oscuro quedaria una placa negra en el medio de una pagina
+   blanca, que es justo lo que se quiere evitar.
+   --------------------------------------------------------------------- */
+
+:root {
+  --sans: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+
+  --papel:  #FFFFFF;   /* --bs-body-bg */
+  --carta:  #FFFFFF;
+  --pauta:  #F1F3F5;   /* el gris de div.sourceCode, aplanado sobre blanco */
+  --prosa:  #343A40;   /* --bs-body-color */
+  --tinta:  #003B4F;   /* el color del codigo: los estados y los numeros */
+  --tinta2: #5E5E5E;   /* el de los comentarios */
+  --linea:  #DEE2E6;   /* --bs-border-color */
+  --muerto: #999CA0;   /* --bs-secondary-color, aplanado */
+
+  /* Los cinco colores del resaltado, cada uno con el papel que ya tiene: */
+  --acento: #00769E;   /* import    -> el nodo de ahora, lo que es nuevo */
+  --verde:  #20794D;   /* string    -> el objetivo */
+  --ocre:   #8F5902;   /* constante -> la frontera, el proximo en salir */
+  --rojo:   #AD0000;   /* numero    -> lo descartado, el fallo */
+  --otro:   #4758AB;   /* funcion   -> el otro lado, en bidireccional */
+
+  --tenue:   rgba(0, 118, 158, .07);
+  --verdoso: rgba(32, 121, 77, .08);
+  --radio:   4px;      /* --bs-border-radius: .25rem sobre 17px */
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--papel);
+  color: var(--prosa);
+  font: 400 15px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- el tablero ----------
+
+   Tres lineas de texto en monoespaciada, igual que tablero() en puzzle.py.
+   El hueco es un punto y no un guion bajo: el guion se apoya en la linea
+   de base y en un bloque de tres lineas parece que falta el renglon. */
+
+.tab {
+  display: inline-block; white-space: pre;
+  font: 400 11px/1.25 var(--mono);
+  color: var(--tinta2);
+  background: var(--carta);
+  border: 1px solid var(--linea); border-radius: var(--radio);
+  padding: 3px 5px;
+}
+.tab.mini { font-size: 8.5px; line-height: 1.2; padding: 2px 3px; }
+.tab.grande {
+  font-size: 17px; line-height: 1.3; padding: 7px 10px;
+  color: var(--acento); border-color: var(--acento); background: var(--tenue);
+}
+
+/* ---------- barra ---------- */
+
+.barra {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap;
+  padding: 18px 28px 14px;
+  background: var(--pauta);
+  border-bottom: 1px solid var(--linea);
+}
+.barra h1 {
+  margin: 0;
+  font: 700 19px/1.25 var(--sans);
+  letter-spacing: -.005em;
+}
+.barra .sub {
+  margin: 3px 0 0;
+  display: flex; align-items: center; gap: 8px;
+  color: var(--tinta2); font-size: 13.5px;
+}
+.barra .sub b { font-family: var(--mono); font-weight: 400; color: var(--acento); }
+
+.mando { display: flex; align-items: center; gap: 10px; }
+.mando button {
+  font: 600 14px/1 var(--sans);
+  color: var(--tinta); background: var(--carta);
+  border: 1px solid var(--linea); border-radius: var(--radio);
+  padding: 9px 14px; cursor: pointer;
+}
+.mando button:hover:not(:disabled) { border-color: var(--acento); color: var(--acento); }
+.mando button:disabled { opacity: .35; cursor: default; }
+.mando button:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+/* el switch tablero / arbol: dos botones pegados, uno hundido */
+.mando .vista { display: flex; border: 1px solid var(--linea); border-radius: var(--radio); overflow: hidden; }
+.mando .vista button {
+  font-weight: 400; font-size: 13px;
+  border: 0; border-radius: 0; padding: 9px 13px;
+  color: var(--tinta2); background: var(--carta);
+}
+.mando .vista button[aria-pressed="true"] {
+  background: var(--tenue); color: var(--acento); font-weight: 600;
+}
+.vuelta {
+  font: 600 11.5px/1 var(--sans);
+  letter-spacing: .08em; text-transform: uppercase;
+  color: var(--otro); border: 1px solid var(--otro); border-radius: var(--radio);
+  padding: 5px 9px;
+}
+.contador { color: var(--tinta2); font-size: 13px; min-width: 96px; text-align: center; }
+.contador b { color: var(--tinta); font-weight: 600; }
+
+/* ---------- riel de pasos ----------
+   Un tablero chiquito por paso: la tira entera es la busqueda de un vistazo. */
+
+.riel {
+  display: flex; align-items: center; gap: 5px;
+  padding: 10px 28px; overflow-x: auto;
+  border-bottom: 1px solid var(--linea);
+}
+.riel .et {
+  color: var(--muerto); font-size: 11px; letter-spacing: .09em;
+  text-transform: uppercase; margin: 0 4px; white-space: nowrap;
+}
+.riel button {
+  background: transparent; border: 0; padding: 2px; cursor: pointer;
+  border-radius: var(--radio); line-height: 0; flex: none;
+}
+.riel button:hover .tab { border-color: var(--acento); color: var(--acento); }
+.riel button[aria-current="true"] { background: var(--acento); }
+.riel button[aria-current="true"] .tab {
+  border-color: var(--acento); color: var(--acento); background: var(--carta);
+}
+.riel button:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+
+/* ---------- cuerpo ---------- */
+
+main {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr);
+  gap: 22px; padding: 22px 28px 40px; align-items: start;
+}
+@media (max-width: 900px) { main { grid-template-columns: minmax(0, 1fr); } }
+
+.tarjeta {
+  background: var(--carta); border: 1px solid var(--linea);
+  border-radius: var(--radio);
+}
+.mapa { padding: 8px; }
+/* El arbol se dibuja a tamano real para que los tableros se lean, y la caja
+   lo deja correr: no entra en la pantalla, y eso tambien hay que verlo. */
+.caja-arbol { display: flex; overflow: auto; max-height: min(64vh, 580px); }
+#arbol { width: auto; height: auto; margin: auto; flex: none; }
+/* Como el .d-none de bootstrap: gana siempre. Hay reglas mas abajo que
+   ponen display:flex y sin el !important le ganaban a esta por orden:
+   al pasar al arbol quedaban las dos vistas juntas. */
+.oculto { display: none !important; }
+
+/* ---------- la escena: el tablero de ahora y a donde puede ir ----------
+
+   Es el equivalente del mapa de Rumania: no muestra la historia de la
+   busqueda, muestra el estado y sus vecinos. La historia esta en el arbol,
+   que es la otra vista. */
+
+.escena {
+  display: flex; align-items: flex-start; gap: 30px;
+  padding: 26px 24px; flex-wrap: wrap;
+}
+.escena .titulo {
+  font: 600 11px/1 var(--sans);
+  letter-spacing: .12em; text-transform: uppercase; color: var(--muerto);
+  margin-bottom: 12px;
+}
+/* Las fichas de verdad, no texto: es la vista para proyectar. */
+.grilla {
+  display: grid; gap: 4px;
+  grid-template-columns: repeat(3, var(--f)); grid-template-rows: repeat(3, var(--f));
+}
+.grilla span {
+  display: grid; place-items: center;
+  background: var(--pauta); border: 1px solid var(--linea); border-radius: var(--radio);
+  font: 700 calc(var(--f) * .44)/1 var(--sans); color: var(--tinta);
+}
+.grilla span.hueco { background: transparent; border-style: dashed; color: transparent; }
+.grilla span.movida {
+  background: var(--acento); border-color: var(--acento); color: var(--papel);
+}
+.actual .grilla { --f: 64px; }
+.actual .datos { margin-top: 12px; font-size: 13.5px; color: var(--tinta2); }
+.actual .datos b { color: var(--tinta); font-weight: 600; }
+
+.hijos { display: flex; flex-direction: column; gap: 10px; }
+.sig {
+  display: flex; align-items: center; gap: 14px;
+  padding: 8px 12px 8px 10px; border-left: 3px solid transparent; border-radius: var(--radio);
+}
+.sig .grilla { --f: 30px; }
+.sig .rotulo { font-size: 13.5px; }
+.sig .rotulo .accion { font-weight: 600; }
+.sig .rotulo .detalle { display: block; font-size: 12.5px; color: var(--muerto); }
+.sig.nuevo { border-left-color: var(--acento); }
+.sig.nuevo .accion { color: var(--acento); }
+.sig.mejora { border-left-color: var(--acento); background: var(--tenue); }
+.sig.mejora .accion { color: var(--acento); }
+.sig.descartado { border-left-color: var(--rojo); }
+.sig.descartado .accion { color: var(--rojo); }
+.sig.descartado .grilla { opacity: .45; }
+.sig.objetivo { background: var(--verdoso); }
+/* Marca el tablero objetivo donde aparezca, como el mapa marcaba Bucharest.
+   No dice que la busqueda pare ahi: eso depende de cuando cada algoritmo
+   prueba el objetivo, y no es lo mismo en todos. */
+.sig .premio {
+  font: 600 11px/1 var(--sans);
+  letter-spacing: .1em; text-transform: uppercase; color: var(--verde);
+}
+.escena .nada { color: var(--rojo); font-size: 14px; max-width: 34ch; }
+
+.panel { display: flex; flex-direction: column; }
+.bloque { padding: 16px 18px; border-bottom: 1px solid var(--linea); }
+.bloque:last-child { border-bottom: 0; }
+.bloque > h2 {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin: 0 0 10px;
+  font: 600 11px/1 var(--sans);
+  letter-spacing: .12em; text-transform: uppercase; color: var(--muerto);
+}
+.bloque > h2 span { letter-spacing: 0; text-transform: none; font-weight: 400; }
+
+/* POP */
+.pop-fila { display: flex; align-items: center; gap: 14px; }
+.pop-datos { display: flex; flex-direction: column; gap: 3px; font-size: 13.5px; color: var(--tinta2); }
+.pop-datos b { color: var(--tinta); font-weight: 600; }
+.camino { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.camino .flecha { color: var(--muerto); font-size: 12px; }
+
+/* EXPAND */
+.hijo {
+  display: grid; grid-template-columns: 14px auto 1fr auto; gap: 3px 10px;
+  align-items: center; padding: 6px 0 6px 8px;
+  border-left: 2px solid transparent; font-size: 14px;
+}
+.hijo .sig { font-weight: 600; }
+.hijo .accion { color: var(--tinta2); font-size: 13px; }
+.hijo .nota { grid-column: 3 / -1; font-size: 12.5px; color: var(--muerto); }
+.hijo.nuevo      { border-left-color: var(--acento); }
+.hijo.nuevo .sig { color: var(--acento); }
+.hijo.mejora     { border-left-color: var(--acento); background: var(--tenue); }
+.hijo.mejora .sig, .hijo.mejora .nota, .hijo.mejora .accion { color: var(--acento); font-weight: 600; }
+.hijo.descartado { border-left-color: var(--rojo); }
+.hijo.descartado .sig { color: var(--rojo); }
+.hijo.descartado .tab { opacity: .55; }
+.hijo .val { font-size: 13px; color: var(--tinta2); }
+
+/* FRONTIER y REACHED: rejillas de tableros, que son decenas */
+.rejilla { display: flex; flex-wrap: wrap; gap: 7px; }
+.q { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.q .val { font-size: 11px; color: var(--tinta2); }
+.q.top .tab { border-color: var(--ocre); border-width: 2px; color: var(--ocre); }
+.q.top .val { color: var(--ocre); font-weight: 600; }
+.q.stale .tab { opacity: .45; border-style: dashed; }
+.q.stale .val { color: var(--muerto); text-decoration: line-through; }
+.q.otro .tab { border-color: var(--otro); color: var(--otro); }
+
+/* DONE */
+.done { padding: 16px 18px; border-top: 1px solid var(--linea); }
+.done.goal { background: var(--verdoso); }
+.done h3 {
+  margin: 0 0 8px;
+  font: 600 12px/1 var(--sans);
+  letter-spacing: .12em; text-transform: uppercase; color: var(--verde);
+}
+.done.fail h3 { color: var(--rojo); }
+.done p { margin: 0; font-size: 14px; }
+.done .costo { margin-top: 8px; color: var(--tinta2); font-size: 13.5px; }
+.nota-paso {
+  margin: 4px 0 0; padding-left: 10px; font-size: 13.5px; color: var(--rojo);
+  border-left: 2px solid var(--rojo);
+}
+
+/* ---------- arbol de busqueda ----------
+   Un nodo por cada camino que llega a ese tablero, no uno por tablero. */
+
+.rama { stroke: var(--linea); stroke-width: 1.6; }
+.rama.sol { stroke: var(--verde); stroke-width: 3.2; }
+.n rect { fill: var(--carta); stroke: var(--linea); stroke-width: 1.4; }
+.n text {
+  font: 400 9px var(--mono);
+  fill: var(--tinta2); text-anchor: middle;
+}
+.n text.g { font-size: 9px; fill: var(--muerto); }
+.n.reached rect { fill: var(--tenue); stroke: var(--acento); }
+.n.frontier rect { stroke: var(--ocre); stroke-width: 2.2; }
+.n.frontier text { fill: var(--ocre); }
+.n.pop rect { fill: var(--tenue); stroke: var(--acento); stroke-width: 3; }
+.n.pop text { fill: var(--acento); font-weight: 600; }
+.n.pop text.g { fill: var(--acento); }
+/* Un hijo que se genero y no llego a entrar a la frontera. */
+.n.descartado rect { fill: var(--carta); stroke: var(--muerto); stroke-dasharray: 2.5 2.5; }
+.n.descartado text { fill: var(--muerto); }
+.n.goal rect { stroke: var(--verde); }
+.n .marca { fill: var(--verde); font-size: 11px; text-anchor: middle; }
+</style>
+
+<header class="barra">
+  <div>
+    <h1 id="nombre"></h1>
+    <p class="sub"><b id="label"></b> &middot; <span id="ruta-titulo"></span></p>
+  </div>
+  <div class="mando">
+    <span class="vista">
+      <button id="v-tablero" aria-pressed="true">tablero</button>
+      <button id="v-arbol" aria-pressed="false">&aacute;rbol</button>
+    </span>
+    <span class="vuelta oculto" id="vuelta"></span>
+    <button id="prev" aria-label="paso anterior">&larr;</button>
+    <span class="contador">paso <b id="i">1</b> / <span id="n">1</span></span>
+    <button id="next" aria-label="paso siguiente">&rarr;</button>
+  </div>
+</header>
+
+<nav class="riel" id="riel"><span class="et">expandidos</span></nav>
+
+<main>
+  <section class="tarjeta mapa">
+    <div class="escena" id="escena"></div>
+    <div class="caja-arbol oculto" id="caja-arbol">
+      <svg id="arbol" role="img" aria-label="arbol de busqueda"></svg>
+    </div>
+  </section>
+
+  <section class="tarjeta panel">
+    <div class="bloque">
+      <h2>POP</h2>
+      <div class="pop-fila">
+        <span id="pop-tab"></span>
+        <div class="pop-datos num" id="pop-datos"></div>
+      </div>
+      <div class="camino" id="pop-camino"></div>
+    </div>
+
+    <div class="bloque" id="caja-expand">
+      <h2>EXPAND <span id="expand-n"></span></h2>
+      <div id="expand"></div>
+      <p class="nota-paso oculto" id="nota"></p>
+    </div>
+
+    <div class="bloque">
+      <h2>FRONTIER <span id="frontier-n"></span></h2>
+      <div class="rejilla" id="frontier"></div>
+    </div>
+
+    <div class="bloque" id="caja-reached">
+      <h2>REACHED <span id="reached-n"></span></h2>
+      <div class="rejilla" id="reached"></div>
+    </div>
+
+    <div class="bloque oculto" id="caja-otros">
+      <h2>REACHED del otro lado <span id="otros-n"></span></h2>
+      <div class="rejilla" id="otros"></div>
+    </div>
+
+    <div class="done oculto" id="done"></div>
+  </section>
+</main>
+
+<script>
+const DATA = __DATA__;
+const SVGNS = "http://www.w3.org/2000/svg";
+const el = (id) => document.getElementById(id);
+const num = (v) => Number.isInteger(v) ? String(v) : String(Math.round(v * 100) / 100);
+// Cuando la frontera se ordena por g no hace falta mostrar la columna dos veces.
+const soloG = DATA.keyName === "g";
+
+/* ---------- un tablero ----------
+   El estado viaja tal cual sale de Python: [1,2,3,4,8,5,7,6,0], con el 0
+   como hueco. Se dibuja en tres lineas, que es como se lee un tablero. */
+
+const filas = (s) => [0, 3, 6].map(i =>
+  s.slice(i, i + 3).map(v => v === 0 ? "·" : v).join(" "));
+
+const tab = (s, clase) =>
+  '<span class="tab ' + (clase || "") + '">' + filas(s).join("\n") + "</span>";
+
+// El mismo tablero con fichas de verdad, para la vista grande. `movida` es
+// la posicion de la ficha que se acaba de correr, si se sabe cual fue.
+const grilla = (s, movida) =>
+  '<div class="grilla">' + s.map((v, i) =>
+    '<span class="' + (v === 0 ? "hueco" : i === movida ? "movida" : "") + '">' +
+    (v === 0 ? "" : v) + "</span>").join("") + "</div>";
+
+// Dos arrays distintos con los mismos numeros no son === en JavaScript,
+// asi que para comparar tableros hace falta una clave.
+const clave = (s) => s.join("");
+const GOAL = clave(DATA.goal);
+
+/* ---------- el riel de pasos ---------- */
+
+let vueltaPrevia = null;
+DATA.frames.forEach((f, i) => {
+  // Cuando el algoritmo da vueltas (profundidad iterativa, bidireccional)
+  // el riel las separa con su etiqueta.
+  if (f.round && f.round !== vueltaPrevia) {
+    const et = document.createElement("span");
+    et.className = "et";
+    et.textContent = f.round;
+    el("riel").appendChild(et);
+    vueltaPrevia = f.round;
+  }
+  const b = document.createElement("button");
+  b.innerHTML = tab(f.pop.state, "mini");
+  b.title = "paso " + (i + 1);
+  b.onclick = () => mostrar(i);
+  el("riel").appendChild(b);
+});
+
+/* ---------- dibujar un cuadro ---------- */
+
+let actual = 0;
+
+function mostrar(i) {
+  actual = Math.max(0, Math.min(i, DATA.frames.length - 1));
+  const f = DATA.frames[actual];
+
+  el("i").textContent = actual + 1;
+  el("prev").disabled = actual === 0;
+  el("next").disabled = actual === DATA.frames.length - 1;
+  [...el("riel").querySelectorAll("button")].forEach((b, j) =>
+    b.setAttribute("aria-current", j === actual));
+
+  /* POP */
+  el("pop-tab").innerHTML = tab(f.pop.state, "grande");
+  el("pop-datos").innerHTML = "g <b>" + num(f.pop.g) + "</b>" +
+    (soloG ? "" : "<span>" + DATA.keyName + " <b>" + num(f.pop.key) + "</b></span>");
+  el("pop-camino").innerHTML = f.pop.path.map(s => tab(s))
+    .join('<span class="flecha">&rarr;</span>');
+  el("vuelta").classList.toggle("oculto", !f.round);
+  el("vuelta").textContent = f.round || "";
+
+  /* EXPAND */
+  el("caja-expand").classList.toggle("oculto", f.children.length === 0 && !f.note);
+  el("nota").classList.toggle("oculto", !f.note);
+  el("nota").textContent = f.note || "";
+  el("expand-n").textContent = f.children.length;
+  el("expand").innerHTML = f.children.map(ch => {
+    const sig = ch.kind === "nuevo" ? "+" : ch.kind === "mejora" ? "↑" : "−";
+    return '<div class="hijo ' + ch.kind + '">' +
+      '<span class="sig">' + sig + "</span>" +
+      tab(ch.state) +
+      '<span class="accion">' + (ch.action || "") + "</span>" +
+      '<span class="val num">g ' + num(ch.g) +
+      (soloG ? "" : "  " + DATA.keyName + " " + num(ch.key)) + "</span>" +
+      '<span class="nota">' + ch.nota + "</span></div>";
+  }).join("");
+
+  /* FRONTIER */
+  el("frontier-n").textContent = f.frontier.length;
+  el("frontier").innerHTML = f.frontier.map((q, j) =>
+    '<span class="q ' + (j === 0 ? "top " : "") + (q.stale ? "stale" : "") + '">' +
+    tab(q.state) + '<span class="val num">' + num(q.key) + "</span></span>").join("");
+
+  /* REACHED */
+  el("caja-reached").classList.toggle("oculto", f.reached === null);
+  if (f.reached) {
+    const conG = f.reached[0][1] !== null;
+    el("reached-n").textContent = f.reached.length;
+    el("reached").innerHTML = f.reached.map(([s, g]) =>
+      '<span class="q">' + tab(s) +
+      (conG ? '<span class="val num">' + num(g) + "</span>" : "") + "</span>").join("");
+  }
+
+  /* REACHED del otro lado (solo bidireccional) */
+  el("caja-otros").classList.toggle("oculto", !f.otros);
+  if (f.otros) {
+    el("otros-n").textContent = f.otros.length;
+    el("otros").innerHTML = f.otros.map(s =>
+      '<span class="q otro">' + tab(s) + "</span>").join("");
+  }
+
+  /* DONE */
+  const done = el("done");
+  done.className = "done " + (f.done ? (f.done.kind === "goal" ? "goal" : "fail") : "oculto");
+  if (f.done && f.done.kind === "goal") {
+    done.innerHTML = "<h3>IS_GOAL &rarr; solucion</h3>" +
+      '<div class="camino">' +
+      f.done.path.map(s => tab(s)).join('<span class="flecha">&rarr;</span>') +
+      "</div>" +
+      '<p class="costo">costo <b class="num">' + num(f.done.cost) + "</b></p>";
+  } else if (f.done) {
+    const esCutoff = f.done.kind === "cutoff";
+    done.innerHTML = "<h3>" + (esCutoff ? "cutoff" : "failure") + "</h3><p>" +
+      (esCutoff ? "no hay solucion dentro del limite: puede haber mas abajo"
+                : "la frontera quedo vacia: no hay solucion") + "</p>";
+  }
+
+  if (vista === "tablero") pintarEscena(f); else pintarArbol(actual);
+}
+
+/* ---------- la escena ----------
+   El tablero de ahora y los tableros a los que puede ir. Es lo que se ve
+   sin saber nada de la historia de la busqueda: el estado y sus vecinos. */
+
+function pintarEscena(f) {
+  // La ficha que se movio es la que quedo donde antes estaba el hueco.
+  const hueco = f.pop.state.indexOf(0);
+
+  let hijos = f.children.map(ch => {
+    const esObjetivo = clave(ch.state) === GOAL;
+    const clases = ["sig", ch.kind].concat(esObjetivo ? ["objetivo"] : []);
+    return '<div class="' + clases.join(" ") + '">' +
+      grilla(ch.state, hueco) +
+      '<div class="rotulo"><span class="accion">' + (ch.action || "") + "</span>" +
+      '<span class="detalle">g ' + num(ch.g) +
+      (soloG ? "" : "  " + DATA.keyName + " " + num(ch.key)) +
+      (ch.nota ? "  ·  " + ch.nota : "") + "</span>" +
+      (esObjetivo ? '<span class="premio">objetivo</span>' : "") +
+      "</div></div>";
+  }).join("");
+
+  if (!hijos) {
+    hijos = '<p class="nada">' +
+      (f.note || "no se generaron hijos") + "</p>";
+  }
+
+  el("escena").innerHTML =
+    '<div class="actual">' +
+    '<p class="titulo">tablero de ahora</p>' +
+    grilla(f.pop.state, -1) +
+    '<p class="datos">g <b>' + num(f.pop.g) + "</b>" +
+    (soloG ? "" : "  " + DATA.keyName + " <b>" + num(f.pop.key) + "</b>") +
+    "</p></div>" +
+    '<div class="hijos"><p class="titulo">estados siguientes posibles</p>' +
+    hijos + "</div>";
+}
+
+/* ---------- el arbol de busqueda ----------
+   armarArbol y acomodar son los mismos de plantilla.html: no dependen de
+   que sea un estado, solo de id, parent y depth. */
+
+const svgArbol = el("arbol");
+const PASO_X = 54, PASO_Y = 82;   // separacion entre nodos
+const ANCHO = 38, ALTO = 36;      // el tablero dibujado
+const RENGLON = 9.9;              // alto de linea del tablero, en px
+
+function armarArbol(hasta) {
+  // Se rearma de cero en cada cuadro: al riel se le puede saltar a
+  // cualquier paso, asi que no sirve ir acumulando.
+  let nodos = new Map(), raices = [];
+  let expandidos = new Set(), descartados = new Set();
+  const meter = (d) => { if (!nodos.has(d.id)) nodos.set(d.id, {...d, hijos: []}); };
+
+  for (let k = 0; k <= hasta; k++) {
+    const f = DATA.frames[k];
+    if (f.pop.parent === null && !nodos.has(f.pop.id)) {
+      // Una raiz nueva con el mismo tablero que otra raiz es una vuelta
+      // nueva: profundidad iterativa tira el arbol y lo rehace. Con otro
+      // tablero es el otro lado, y ahi son dos arboles a la vez.
+      if (raices.some(r => clave(nodos.get(r).state) === clave(f.pop.state))) {
+        nodos = new Map(); raices = [];
+        expandidos = new Set(); descartados = new Set();
+      }
+      raices.push(f.pop.id);
+    }
+    meter(f.pop);
+    if (k < hasta) expandidos.add(f.pop.id);
+    for (const ch of f.children) {
+      meter(ch);
+      if (ch.kind === "descartado") descartados.add(ch.id);
+    }
+  }
+  for (const n of nodos.values()) {
+    const padre = nodos.get(n.parent);
+    if (padre) padre.hijos.push(n.id);
+  }
+  return { nodos, raices, expandidos, descartados };
+}
+
+function acomodar(nodos, raices) {
+  // Cada hoja ocupa una columna; cada padre se centra sobre sus hijos.
+  let columna = 0;
+  const ubicar = (id) => {
+    const n = nodos.get(id);
+    if (n.hijos.length === 0) {
+      n.x = columna++ * PASO_X;
+    } else {
+      n.hijos.forEach(ubicar);
+      const xs = n.hijos.map(h => nodos.get(h).x);
+      n.x = (xs[0] + xs[xs.length - 1]) / 2;
+    }
+    n.y = n.depth * PASO_Y;
+  };
+  raices.forEach(r => { ubicar(r); columna += 1; });
+}
+
+function pintarArbol(i) {
+  const f = DATA.frames[i];
+  const { nodos, raices, expandidos, descartados } = armarArbol(i);
+  acomodar(nodos, raices);
+
+  const xs = [...nodos.values()].map(n => n.x);
+  const ys = [...nodos.values()].map(n => n.y);
+  const borde = 40;
+  const ancho = Math.max(...xs) - Math.min(...xs) + 2 * borde;
+  const alto = Math.max(...ys) + 2 * borde;
+  svgArbol.setAttribute("viewBox",
+    (Math.min(...xs) - borde) + " " + (-borde) + " " + ancho + " " + alto);
+  // Un punto del dibujo es un pixel: los tableros se leen siempre igual.
+  svgArbol.setAttribute("width", ancho);
+  svgArbol.setAttribute("height", alto);
+  svgArbol.textContent = "";
+
+  // El camino del nodo actual hasta la raiz, marcado con la rama gruesa.
+  let punta = f.pop.id;
+  if (f.done && f.done.kind === "goal") {
+    for (const n of nodos.values()) {
+      if (clave(n.state) === GOAL && n.g === f.done.cost) punta = n.id;
+    }
+  }
+  const camino = new Set();
+  for (let id = punta; nodos.has(id); id = nodos.get(id).parent) camino.add(id);
+
+  // primero las ramas, para que queden abajo de los nodos
+  for (const n of nodos.values()) {
+    const padre = nodos.get(n.parent);
+    if (!padre) continue;
+    const linea = document.createElementNS(SVGNS, "line");
+    linea.setAttribute("class", camino.has(n.id) ? "rama sol" : "rama");
+    // De borde a borde: si van de centro a centro la linea cruza por
+    // adentro del tablero y tapa los numeros.
+    linea.setAttribute("x1", padre.x); linea.setAttribute("y1", padre.y + ALTO / 2);
+    linea.setAttribute("x2", n.x); linea.setAttribute("y2", n.y - ALTO / 2);
+    svgArbol.appendChild(linea);
+  }
+
+  for (const n of nodos.values()) {
+    // Generado y todavia sin expandir es, en estos algoritmos, estar en la
+    // frontera: todo hijo que no se descarta entra a la cola.
+    const estado = n.id === f.pop.id ? "pop"
+                 : expandidos.has(n.id) ? "reached"
+                 : descartados.has(n.id) ? "descartado"
+                 : "frontier";
+    const clases = ["n", estado];
+    if (clave(n.state) === GOAL) clases.push("goal");
+
+    const grupo = document.createElementNS(SVGNS, "g");
+    grupo.setAttribute("class", clases.join(" "));
+
+    const caja = document.createElementNS(SVGNS, "rect");
+    caja.setAttribute("x", n.x - ANCHO / 2); caja.setAttribute("y", n.y - ALTO / 2);
+    caja.setAttribute("width", ANCHO); caja.setAttribute("height", ALTO);
+    caja.setAttribute("rx", 4);
+    grupo.appendChild(caja);
+
+    // Tres renglones centrados en n.y: el primer dy baja hasta la linea de
+    // base del de arriba, y de ahi cada uno un renglon mas.
+    const t = document.createElementNS(SVGNS, "text");
+    t.setAttribute("x", n.x); t.setAttribute("y", n.y - 2 * RENGLON);
+    for (const fila of filas(n.state)) {
+      const linea = document.createElementNS(SVGNS, "tspan");
+      linea.setAttribute("x", n.x); linea.setAttribute("dy", RENGLON);
+      linea.textContent = fila;
+      t.appendChild(linea);
+    }
+    grupo.appendChild(t);
+
+    // g va debajo del tablero, afuera de la caja.
+    const g = document.createElementNS(SVGNS, "text");
+    g.setAttribute("class", "g");
+    g.setAttribute("x", n.x); g.setAttribute("y", n.y + ALTO / 2 + 11);
+    g.textContent = num(n.g);
+    grupo.appendChild(g);
+
+    const titulo = document.createElementNS(SVGNS, "title");
+    titulo.textContent = (n.action ? n.action + " — " : "") + "g = " + num(n.g);
+    grupo.appendChild(titulo);
+
+    svgArbol.appendChild(grupo);
+  }
+
+  // La caja sigue al nodo que se esta expandiendo: en un arbol grande, si
+  // no, la busqueda se va de pantalla y hay que ir a buscarla a mano.
+  const cajaArbol = el("caja-arbol"), aca = nodos.get(f.pop.id);
+  if (aca) {
+    cajaArbol.scrollLeft = aca.x - Math.min(...xs) + borde - cajaArbol.clientWidth / 2;
+    cajaArbol.scrollTop = aca.y + borde - cajaArbol.clientHeight / 2;
+  }
+}
+
+/* ---------- controles ---------- */
+
+// Arranca en la vista generica, la del tablero. El arbol es la otra mitad
+// de la clase y se prende con el switch.
+let vista = "tablero";
+
+function cambiarVista(v) {
+  vista = v;
+  el("v-tablero").setAttribute("aria-pressed", v === "tablero");
+  el("v-arbol").setAttribute("aria-pressed", v === "arbol");
+  el("escena").classList.toggle("oculto", v !== "tablero");
+  el("caja-arbol").classList.toggle("oculto", v !== "arbol");
+  mostrar(actual);
+}
+el("v-tablero").onclick = () => cambiarVista("tablero");
+el("v-arbol").onclick = () => cambiarVista("arbol");
+
+el("nombre").textContent = DATA.name;
+el("label").textContent = DATA.label;
+el("ruta-titulo").innerHTML =
+  tab(DATA.initial, "mini") + '<span class="flecha">&rarr;</span>' + tab(DATA.goal, "mini");
+el("n").textContent = DATA.frames.length;
+el("prev").onclick = () => mostrar(actual - 1);
+el("next").onclick = () => mostrar(actual + 1);
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "ArrowRight" || ev.key === " ") { mostrar(actual + 1); ev.preventDefault(); }
+  if (ev.key === "ArrowLeft") { mostrar(actual - 1); ev.preventDefault(); }
+  if (ev.key === "Home") mostrar(0);
+  if (ev.key === "End") mostrar(DATA.frames.length - 1);
+});
+
+mostrar(0);
+</script>

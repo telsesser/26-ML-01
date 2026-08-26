@@ -182,7 +182,6 @@ class Web(Silent):
             "links": sorted(
                 {(min(a, b), max(a, b), d) for (a, b), d in mapa.distances.items()}
             ),
-            "h": mapa.straight_line_distance,
             "viewBox": (
                 f"{min(xs) - borde} {min(ys) - borde} "
                 f"{max(xs) - min(xs) + 2 * borde} "
@@ -198,7 +197,10 @@ class Web(Silent):
         )
 
     def write(self, destino, open_browser=True):
-        salida = Path(__file__).with_name(destino)
+        # Las paginas generadas van todas juntas a salidas/, fuera de lib/.
+        carpeta = Path(__file__).resolve().parent.parent / "salidas"
+        carpeta.mkdir(exist_ok=True)
+        salida = carpeta / destino
         salida.write_text(self.html(), encoding="utf-8")
         if open_browser:
             webbrowser.open(salida.as_uri())
