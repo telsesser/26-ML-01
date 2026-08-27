@@ -30,6 +30,14 @@ Uso:
     uv run puzzle.py --view     ademas escribe las paginas paso a paso
 """
 
+import sys
+from pathlib import Path
+
+# Los modulos comunes viven en la carpeta 0-lib/ de al lado.
+LIB = str(Path(__file__).resolve().parent.parent / "0-lib")
+if LIB not in sys.path:
+    sys.path.append(LIB)
+
 import random
 
 from problem import Problem

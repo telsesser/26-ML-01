@@ -1,5 +1,7 @@
 project:
   type: website
+  # Este notebook es el sitio entero. El _site/ que sale de aca es lo que se
+  # publica con `quarto publish gh-pages`, corrido desde esta carpeta.
   output-dir: _site
   render:
     - busqueda.ipynb

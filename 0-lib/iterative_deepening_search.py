@@ -43,6 +43,10 @@ def iterative_deepening_search(problem, view=silent):
 
 if __name__ == "__main__":
     import sys
+    from pathlib import Path
+
+    # El mapa de Rumania vive en la carpeta del problema, no en 0-lib.
+    sys.path.append(str(Path(__file__).resolve().parent.parent / "1-romania"))
 
     from node import depth, path_states
     from problem import RouteProblem

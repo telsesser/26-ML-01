@@ -7,5 +7,8 @@ __pycache__/
 /.quarto/
 **/*.quarto_ipynb
 
-# Paginas que generan los scripts de lib/ al correrse solos.
+# Paginas que generan los scripts de 0-lib/ al correrse solos.
 salidas/
+
+# Config local del editor/agente.
+.claude/

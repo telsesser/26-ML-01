@@ -19,8 +19,15 @@ como un array. Del lado de JavaScript llega [1,2,3,4,8,5,7,6,0], que es
 lo que la plantilla necesita para dibujar el tablero.
 """
 
-import json
+import sys
 from pathlib import Path
+
+# Los modulos comunes viven en la carpeta 0-lib/ de al lado.
+LIB = str(Path(__file__).resolve().parent.parent / "0-lib")
+if LIB not in sys.path:
+    sys.path.append(LIB)
+
+import json
 
 from web import Web
 
